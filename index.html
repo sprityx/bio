@@ -533,6 +533,97 @@
     background: var(--muted);
     animation: none;
   }
+  /* comments panel */
+  .comments-panel {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 10px;
+    animation: slideDown 0.2s ease;
+  }
+  .comments-panel.open { display: flex; }
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 180px;
+    overflow-y: auto;
+  }
+  .comments-list::-webkit-scrollbar { width: 3px; }
+  .comments-list::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 99px; }
+  .comment-item {
+    padding: 8px 10px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  .comment-author {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--accent);
+    font-family: 'Space Mono', monospace;
+  }
+  .comment-text {
+    font-size: 0.82rem;
+    color: rgba(240,238,232,0.75);
+    line-height: 1.4;
+    margin-top: 2px;
+  }
+  .comment-time {
+    font-size: 0.6rem;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    margin-top: 3px;
+  }
+  .comments-empty {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+    text-align: center;
+    padding: 8px 0;
+  }
+  .comment-form {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .comment-input {
+    flex: 1;
+    min-width: 80px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 10px;
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    outline: none;
+    transition: border-color 0.2s;
+    cursor: none;
+  }
+  .comment-input:focus { border-color: var(--accent); }
+  .comment-input::placeholder { color: var(--muted); }
+  .comment-submit {
+    background: var(--accent-dim);
+    border: 1px solid rgba(91,163,245,0.25);
+    border-radius: 8px;
+    padding: 8px 14px;
+    color: var(--accent);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 700;
+    cursor: none;
+    transition: background 0.2s;
+  }
+  .comment-submit:hover { background: rgba(91,163,245,0.2); }
   .rank-iron     { color: #9e9e9e; }
   .rank-bronze   { color: #cd7f32; }
   .rank-silver   { color: #c0c0c0; }
@@ -600,13 +691,24 @@
       <svg width="13" height="13" viewBox="0 0 24 24" fill="rgba(255,70,84,0.8)"><path d="M12.602.222a.504.504 0 0 0-.813.372L11.4 5.28a.504.504 0 0 1-.504.477H6.148a.504.504 0 0 0-.35.863l9.853 9.392a.504.504 0 0 0 .762-.094l4.2-6.804a.504.504 0 0 0-.308-.749L12.602.222zm-1.204 23.556a.504.504 0 0 0 .813-.372l.389-4.686a.504.504 0 0 1 .504-.477h4.748a.504.504 0 0 0 .35-.863L8.349 8.988a.504.504 0 0 0-.762.094l-4.2 6.804a.504.504 0 0 0 .308.749l7.703 7.143z"/></svg>
       <span id="val-rank" class="pill-val">—</span>
     </div>
-    <div class="status-pill">
+    <div class="status-pill" id="visitors-pill" onclick="toggleComments()" style="cursor:none;">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="rgba(91,163,245,0.7)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
-      <span id="visitor-label" class="pill-val">visitors</span>
+      <span class="pill-val">visitors <span id="comment-count"></span></span>
+      <span style="font-size:0.6rem;color:var(--muted);margin-left:2px;">▾</span>
     </div>
   </div>
 
-  <!-- currently playing — edit CURRENT_GAME to update -->
+  <!-- comments panel -->
+  <div class="comments-panel" id="comments-panel">
+    <div class="comments-list" id="comments-list">
+      <p class="comments-empty" id="comments-empty">no comments yet. be first 👀</p>
+    </div>
+    <div class="comment-form">
+      <input class="comment-input" id="comment-name" type="text" placeholder="name" maxlength="32" autocomplete="off">
+      <input class="comment-input" id="comment-msg" type="text" placeholder="leave a message..." maxlength="140" autocomplete="off">
+      <button class="comment-submit" onclick="submitComment()">post</button>
+    </div>
+  </div>
   <div class="playing-card" style="margin-bottom:10px;">
     <div class="playing-icon" id="game-icon">🎮</div>
     <div class="playing-text">
@@ -681,25 +783,30 @@
   const LASTFM_API_KEY  = '6e3b02b4cf0d93cf2b7904d06d432281';
   const LASTFM_USERNAME = 'yz_o';
 
-  // your valorant name and tag (e.g. name='ashyzh' tag='1234')
-  // find it in-game top right corner: NAME#TAG
   const VAL_NAME   = 'ash';
   const VAL_TAG    = 'balls';
   const VAL_REGION = 'br';
 
-  // currently playing — just edit this manually whenever
   const CURRENT_GAME      = 'Valorant';
   const CURRENT_GAME_ICON = '🎮';
+
+  // COMMENTS — jsonbin.io setup (free):
+  // 1. go to jsonbin.io and create a free account
+  // 2. go to Bins → Create a Bin, paste: {"comments":[]}
+  // 3. copy the Bin ID from the URL
+  // 4. go to API Keys → create a key (any name)
+  // 5. paste both below
+  const JSONBIN_BIN_ID = '69ee410436566621a8f39960';
+  const JSONBIN_API_KEY = '$2a$10$4axX2M.qFpEJd1Q9xsv3meb0aXHzahzd8CqOBpznpXKNsAqJDlThG';
   // ─────────────────────────────────────────────────────────
 
   document.getElementById('game-name').textContent = CURRENT_GAME;
   document.getElementById('game-icon').textContent = CURRENT_GAME_ICON;
 
-  // cursor trail
+  // ── cursor trail ─────────────────────────────────────────
   const cursor = document.getElementById('cursor');
   const TRAIL_LENGTH = 12;
   const trail = [];
-
   for (let i = 0; i < TRAIL_LENGTH; i++) {
     const dot = document.createElement('div');
     dot.className = 'trail-dot';
@@ -708,18 +815,13 @@
     document.body.appendChild(dot);
     trail.push({ el: dot, x: 0, y: 0 });
   }
-
   let mouseX = 0, mouseY = 0;
-
   document.addEventListener('mousemove', e => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
+    mouseX = e.clientX; mouseY = e.clientY;
     cursor.style.left = mouseX + 'px';
     cursor.style.top  = mouseY + 'px';
   });
-
   (function animateTrail() {
-    let x = mouseX, y = mouseY;
     trail.forEach((dot, i) => {
       const prev = i === 0 ? { x: mouseX, y: mouseY } : trail[i - 1];
       dot.x += (prev.x - dot.x) * 0.4;
@@ -730,93 +832,118 @@
     requestAnimationFrame(animateTrail);
   })();
 
-  // twitch live check via decapi
+  // ── twitch live + last stream date ───────────────────────
+  function timeAgo(dateStr) {
+    const d = new Date(dateStr);
+    if (isNaN(d)) return null;
+    const diff = (Date.now() - d) / 1000;
+    if (diff < 3600)   return `${Math.floor(diff/60)}m ago`;
+    if (diff < 86400)  return `${Math.floor(diff/3600)}h ago`;
+    if (diff < 604800) return `${Math.floor(diff/86400)}d ago`;
+    return d.toLocaleDateString('en', { month: 'short', day: 'numeric' });
+  }
+
   async function checkTwitchLive() {
+    const pill     = document.getElementById('twitch-status-pill');
+    const pillText = document.getElementById('twitch-status-text');
     try {
-      const res = await fetch('https://decapi.me/twitch/uptime/dr1wn');
-      const text = await res.text().then(t => t.trim());
-      const isLive = !text.toLowerCase().includes('offline') && !text.toLowerCase().includes('error');
-      const banner = document.getElementById('live-banner');
-      const twitchLink = document.getElementById('twitch-link');
-      const avatarWrap = document.getElementById('avatar-wrap');
-      const pill = document.getElementById('twitch-status-pill');
-      const pillText = document.getElementById('twitch-status-text');
-      const pillDot = document.getElementById('twitch-status-dot');
+      const res  = await fetch('https://decapi.me/twitch/uptime/dr1wn');
+      const text = (await res.text()).trim();
+      const isLive = !text.toLowerCase().includes('offline') && !text.toLowerCase().includes('error') && text.length > 0;
 
       if (isLive) {
-        // top banner
-        banner.classList.add('visible');
+        document.getElementById('live-banner').classList.add('visible');
         document.getElementById('live-text').textContent = `LIVE — ${text}`;
-        // twitch card
-        twitchLink.classList.add('live-link');
+        document.getElementById('twitch-link').classList.add('live-link');
         document.getElementById('twitch-label').innerHTML =
           '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#ff4444;margin-right:6px;animation:pulse-red 1.5s ease-in-out infinite;"></span>live now';
-        avatarWrap.classList.add('live');
-        // status pill
-        pill.classList.add('live');
-        pill.classList.remove('offline');
+        document.getElementById('avatar-wrap').classList.add('live');
+        pill.classList.add('live'); pill.classList.remove('offline');
         pillText.textContent = '🔴 LIVE NOW';
       } else {
-        pill.classList.add('offline');
-        pill.classList.remove('live');
-        // try to get last vod date
+        pill.classList.add('offline'); pill.classList.remove('live');
+        // fetch last VOD created_at via decapi videos endpoint
         try {
-          const vodRes = await fetch('https://decapi.me/twitch/lastvod/dr1wn');
-          const vodText = await vodRes.text().then(t => t.trim());
-          // decapi returns something like "VOD title (2 days ago)"
-          const match = vodText.match(/\((.+?)\)/);
-          pillText.textContent = match ? `last live: ${match[1]}` : 'last live: twitch';
+          const vodRes  = await fetch('https://decapi.me/twitch/videos/dr1wn?limit=1&offset=0');
+          const vodText = (await vodRes.text()).trim();
+          // decapi returns: "Title | https://... | YYYY-MM-DD HH:MM:SS"
+          const parts = vodText.split('|');
+          if (parts.length >= 3) {
+            const ago = timeAgo(parts[2].trim());
+            pillText.textContent = ago ? `last live: ${ago}` : 'last live: recently';
+          } else {
+            pillText.textContent = 'offline';
+          }
         } catch {
-          pillText.textContent = 'last live: twitch';
+          pillText.textContent = 'offline';
         }
       }
-    } catch { /* silently fail */ }
+    } catch {
+      document.getElementById('twitch-status-pill').classList.add('offline');
+      document.getElementById('twitch-status-text').textContent = 'offline';
+    }
   }
 
-  // valorant rank via henrik's free API
+  // ── val rank ─────────────────────────────────────────────
   async function fetchValRank() {
-    if (VAL_NAME === 'YOUR_VAL_NAME') {
-      document.getElementById('val-rank').textContent = 'val rank';
-      return;
-    }
+    const el = document.getElementById('val-rank');
     try {
-      const res = await fetch(
-        `https://api.henrikdev.xyz/valorant/v2/mmr/${VAL_REGION}/${encodeURIComponent(VAL_NAME)}/${encodeURIComponent(VAL_TAG)}`
+      // try v3 first (latest henrik endpoint)
+      let res = await fetch(
+        `https://api.henrikdev.xyz/valorant/v3/mmr/${VAL_REGION}/pc/${encodeURIComponent(VAL_NAME)}/${encodeURIComponent(VAL_TAG)}`
       );
-      const data = await res.json();
-      if (data.status !== 200) { document.getElementById('val-rank').textContent = '—'; return; }
-      const tier = data.data.current_data.currenttierpatched || '—';
-      const rr   = data.data.current_data.ranking_in_tier;
-      const tierLower = tier.toLowerCase();
-      let cls = 'rank-iron';
-      if (tierLower.includes('bronze'))    cls = 'rank-bronze';
-      if (tierLower.includes('silver'))    cls = 'rank-silver';
-      if (tierLower.includes('gold'))      cls = 'rank-gold';
-      if (tierLower.includes('platinum'))  cls = 'rank-platinum';
-      if (tierLower.includes('diamond'))   cls = 'rank-diamond';
-      if (tierLower.includes('ascendant')) cls = 'rank-ascendant';
-      if (tierLower.includes('immortal'))  cls = 'rank-immortal';
-      if (tierLower.includes('radiant'))   cls = 'rank-radiant';
-      const el = document.getElementById('val-rank');
-      el.textContent = `${tier} ${rr}RR`;
+      let data = await res.json();
+
+      let tier, rr;
+
+      if (data.status === 200 && data.data?.current) {
+        // v3 structure
+        tier = data.data.current.tier?.name || '—';
+        rr   = data.data.current.rr ?? '';
+      } else {
+        // fallback to v2
+        res  = await fetch(
+          `https://api.henrikdev.xyz/valorant/v2/mmr/${VAL_REGION}/${encodeURIComponent(VAL_NAME)}/${encodeURIComponent(VAL_TAG)}`
+        );
+        data = await res.json();
+        if (data.status === 200 && data.data?.current_data) {
+          tier = data.data.current_data.currenttierpatched || '—';
+          rr   = data.data.current_data.ranking_in_tier ?? '';
+        } else {
+          el.textContent = '—'; return;
+        }
+      }
+
+      const t = (tier || '').toLowerCase();
+      let cls = '';
+      if (t.includes('iron'))      cls = 'rank-iron';
+      else if (t.includes('bronze'))    cls = 'rank-bronze';
+      else if (t.includes('silver'))    cls = 'rank-silver';
+      else if (t.includes('gold'))      cls = 'rank-gold';
+      else if (t.includes('platinum'))  cls = 'rank-platinum';
+      else if (t.includes('diamond'))   cls = 'rank-diamond';
+      else if (t.includes('ascendant')) cls = 'rank-ascendant';
+      else if (t.includes('immortal'))  cls = 'rank-immortal';
+      else if (t.includes('radiant'))   cls = 'rank-radiant';
+
+      el.textContent = rr !== '' ? `${tier} · ${rr}RR` : tier;
       el.className = `pill-val ${cls}`;
     } catch {
-      document.getElementById('val-rank').textContent = '—';
+      el.textContent = '—';
     }
   }
 
-  // spotify / last.fm
+  // ── spotify / last.fm ────────────────────────────────────
   let spotifyUrl = 'https://open.spotify.com';
-
   async function fetchLastPlayed() {
     try {
-      const res = await fetch(
+      const res  = await fetch(
         `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${LASTFM_USERNAME}&api_key=${LASTFM_API_KEY}&format=json&limit=1`
       );
-      const data = await res.json();
+      const data  = await res.json();
       const track = data.recenttracks.track[0];
       const isNowPlaying = track['@attr']?.nowplaying === 'true';
-      spotifyUrl = track.url;
+      spotifyUrl  = track.url;
       document.getElementById('song-title').textContent = track.name;
       document.getElementById('song-artist').textContent =
         (isNowPlaying ? '▶  ' : '↺  ') + track.artist['#text'];
@@ -828,9 +955,9 @@
       document.getElementById('music-bars').classList.add('paused');
     }
   }
-
   function openSpotify() { window.open(spotifyUrl, '_blank', 'noopener'); }
 
+  // ── discord copy ─────────────────────────────────────────
   function copyDiscord() {
     navigator.clipboard.writeText('sently.').then(() => {
       const t = document.getElementById('toast');
@@ -839,12 +966,99 @@
     });
   }
 
-  // init
+  // ── comments ─────────────────────────────────────────────
+  let commentsOpen = false;
+  let commentsData = [];
+
+  function toggleComments() {
+    commentsOpen = !commentsOpen;
+    const panel = document.getElementById('comments-panel');
+    panel.classList.toggle('open', commentsOpen);
+    if (commentsOpen && commentsData.length === 0) loadComments();
+  }
+
+  async function loadComments() {
+    if (JSONBIN_BIN_ID === 'YOUR_BIN_ID_HERE') {
+      document.getElementById('comments-empty').textContent = 'set up jsonbin to enable comments — see code comments';
+      return;
+    }
+    try {
+      const res  = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
+        headers: { 'X-Master-Key': JSONBIN_API_KEY }
+      });
+      const data = await res.json();
+      commentsData = data.record.comments || [];
+      renderComments();
+    } catch {
+      document.getElementById('comments-empty').textContent = 'could not load comments';
+    }
+  }
+
+  function renderComments() {
+    const list  = document.getElementById('comments-list');
+    const empty = document.getElementById('comments-empty');
+    if (commentsData.length === 0) { empty.style.display = 'block'; return; }
+    empty.style.display = 'none';
+    list.innerHTML = '';
+    // newest first
+    [...commentsData].reverse().forEach(c => {
+      const item = document.createElement('div');
+      item.className = 'comment-item';
+      item.innerHTML = `
+        <div class="comment-author">${escHtml(c.name)}</div>
+        <div class="comment-text">${escHtml(c.msg)}</div>
+        <div class="comment-time">${c.time}</div>
+      `;
+      list.appendChild(item);
+    });
+  }
+
+  async function submitComment() {
+    if (JSONBIN_BIN_ID === 'YOUR_BIN_ID_HERE') return;
+    const name = document.getElementById('comment-name').value.trim();
+    const msg  = document.getElementById('comment-msg').value.trim();
+    if (!name || !msg) return;
+    const btn = document.querySelector('.comment-submit');
+    btn.textContent = '...'; btn.disabled = true;
+    try {
+      // fetch latest first to avoid clobbering
+      const getRes = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
+        headers: { 'X-Master-Key': JSONBIN_API_KEY }
+      });
+      const latest = await getRes.json();
+      const existing = latest.record.comments || [];
+      const newComment = {
+        name,
+        msg,
+        time: new Date().toLocaleDateString('en', { month: 'short', day: 'numeric', year: 'numeric' })
+      };
+      existing.push(newComment);
+      await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_API_KEY },
+        body: JSON.stringify({ comments: existing })
+      });
+      commentsData = existing;
+      renderComments();
+      document.getElementById('comment-name').value = '';
+      document.getElementById('comment-msg').value = '';
+    } catch {
+      /* silent fail */
+    }
+    btn.textContent = 'post'; btn.disabled = false;
+  }
+
+  function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ── init ─────────────────────────────────────────────────
   checkTwitchLive();
   fetchValRank();
   fetchLastPlayed();
   setInterval(fetchLastPlayed, 60000);
   setInterval(checkTwitchLive, 120000);
 </script>
+
 </body>
 </html>
