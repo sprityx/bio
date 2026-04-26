@@ -29,6 +29,7 @@
     align-items: center;
     justify-content: center;
     padding: 2rem 1rem;
+    cursor: none;
   }
 
   body::before {
@@ -41,6 +42,32 @@
       repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.02) 40px);
     pointer-events: none;
     z-index: 0;
+  }
+
+  /* cursor */
+  #cursor {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    background: var(--accent);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s, opacity 0.1s;
+    mix-blend-mode: screen;
+  }
+
+  .trail-dot {
+    position: fixed;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    background: var(--accent);
+    mix-blend-mode: screen;
   }
 
   .container {
@@ -57,6 +84,44 @@
     padding-bottom: 2rem;
   }
 
+  /* live banner above avatar */
+  .live-banner {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 0.75rem;
+    padding: 4px 14px;
+    background: rgba(145,70,255,0.15);
+    border: 1px solid rgba(145,70,255,0.3);
+    border-radius: 999px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    color: rgba(200,170,255,0.9);
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .live-banner.visible { display: flex; }
+
+  .live-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #ff4444;
+    animation: pulse-red 1.5s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes pulse-red {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(255,68,68,0.4); }
+    50% { opacity: 0.8; box-shadow: 0 0 0 4px rgba(255,68,68,0); }
+  }
+
   .avatar-wrap {
     width: 88px;
     height: 88px;
@@ -71,6 +136,11 @@
     border-radius: 50%;
     background: conic-gradient(var(--accent) 0deg, transparent 120deg, transparent 240deg, var(--accent) 360deg);
     animation: spin 8s linear infinite;
+  }
+
+  /* when live, ring turns purple */
+  .avatar-wrap.live::before {
+    background: conic-gradient(rgba(145,70,255,0.9) 0deg, transparent 120deg, transparent 240deg, rgba(145,70,255,0.9) 360deg);
   }
 
   @keyframes spin { to { transform: rotate(360deg); } }
@@ -140,12 +210,7 @@
     gap: 8px;
   }
 
-  .bio-line .dot {
-    color: var(--accent);
-    opacity: 0.5;
-    font-size: 0.6rem;
-  }
-
+  .bio-line .dot { color: var(--accent); opacity: 0.5; font-size: 0.6rem; }
   .bio-accent { color: rgba(91,163,245,0.8); }
 
   .tags {
@@ -165,6 +230,76 @@
     border-radius: 999px;
     color: var(--muted);
     background: var(--surface);
+  }
+
+  /* status row — val rank + visitor count */
+  .status-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 0.5rem;
+  }
+
+  .status-pill {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 9px 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+
+  .status-pill .pill-val {
+    font-weight: 700;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.8rem;
+    color: var(--text);
+  }
+
+  /* currently playing */
+  .playing-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 0;
+  }
+
+  .playing-icon {
+    font-size: 1.3rem;
+    flex-shrink: 0;
+    width: 32px;
+    text-align: center;
+  }
+
+  .playing-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+  }
+
+  .playing-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+  }
+
+  .playing-game {
+    font-size: 0.88rem;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .links {
@@ -188,7 +323,7 @@
     transition: border-color 0.2s, background 0.2s, transform 0.15s;
     position: relative;
     overflow: hidden;
-    cursor: pointer;
+    cursor: none;
   }
 
   .link::after {
@@ -224,6 +359,16 @@
     background: rgba(91,163,245,0.18);
   }
 
+  .link.live-link {
+    border-color: rgba(145,70,255,0.3);
+    background: rgba(145,70,255,0.08);
+  }
+
+  .link.live-link:hover {
+    border-color: rgba(145,70,255,0.6);
+    background: rgba(145,70,255,0.15);
+  }
+
   .link-icon {
     width: 32px;
     height: 32px;
@@ -242,10 +387,7 @@
     flex: 1;
   }
 
-  .link-title {
-    font-size: 0.88rem;
-    font-weight: 700;
-  }
+  .link-title { font-size: 0.88rem; font-weight: 700; }
 
   .link-sub {
     font-size: 0.72rem;
@@ -270,7 +412,13 @@
     font-size: 0.65rem;
     color: rgba(122,120,112,0.5);
     letter-spacing: 0.05em;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
   }
+
+  .visitor-count img { opacity: 0.4; }
 
   .status-dot {
     display: inline-block;
@@ -336,19 +484,86 @@
     transform: translateX(-50%) translateY(0);
   }
 
+  /* twitch status pill */
+  .twitch-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 14px;
+    border-radius: 999px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    text-decoration: none;
+    font-weight: 700;
+    transition: opacity 0.2s;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+
+  .twitch-status-pill:hover { opacity: 0.75; }
+
+  .twitch-status-pill.live {
+    background: rgba(145,70,255,0.15);
+    border-color: rgba(145,70,255,0.35);
+    color: rgba(200,170,255,0.95);
+  }
+
+  .twitch-status-pill.offline {
+    background: var(--surface);
+    border-color: var(--border);
+    color: var(--muted);
+  }
+
+  .twitch-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: var(--muted);
+  }
+
+  .twitch-status-pill.live .twitch-status-dot {
+    background: #ff4444;
+    animation: pulse-red 1.5s ease-in-out infinite;
+  }
+
+  .twitch-status-pill.offline .twitch-status-dot {
+    background: var(--muted);
+    animation: none;
+  }
+  .rank-iron     { color: #9e9e9e; }
+  .rank-bronze   { color: #cd7f32; }
+  .rank-silver   { color: #c0c0c0; }
+  .rank-gold     { color: #ffd700; }
+  .rank-platinum { color: #00e5ff; }
+  .rank-diamond  { color: #b388ff; }
+  .rank-ascendant{ color: #69f0ae; }
+  .rank-immortal { color: #ff5252; }
+  .rank-radiant  { color: #ffd740; }
+
   @media (prefers-reduced-motion: reduce) {
-    .avatar-wrap::before, .status-dot, .music-bar span { animation: none; }
+    .avatar-wrap::before, .status-dot, .music-bar span, .live-dot { animation: none; }
     .link { transition: none; }
   }
 </style>
 </head>
 <body>
+
+<div id="cursor"></div>
+
 <main class="container" role="main">
 
   <header class="header">
-    <div class="avatar-wrap">
+
+    <a class="live-banner" id="live-banner" href="https://twitch.tv/dr1wn" target="_blank" rel="noopener">
+      <span class="live-dot"></span>
+      <span id="live-text">LIVE NOW</span>
+    </a>
+
+    <div class="avatar-wrap" id="avatar-wrap">
       <div class="avatar">
-        <!-- rename your video to pfp.mp4 and upload it to the repo root -->
         <video src="pfp.mp4" autoplay loop muted playsinline></video>
         <span class="initials">az</span>
       </div>
@@ -372,21 +587,42 @@
     </div>
 
     <div class="tags">
-      <span class="tag">VALORANT</span>
-      <span class="tag">osu!</span>
-      <span class="tag">assetto corsa</span>
-      <span class="tag">minecraft</span>
+      <a class="twitch-status-pill" id="twitch-status-pill" href="https://twitch.tv/dr1wn" target="_blank" rel="noopener">
+        <span class="twitch-status-dot" id="twitch-status-dot"></span>
+        <span id="twitch-status-text">checking...</span>
+      </a>
     </div>
   </header>
 
+  <!-- status row: valorant rank + visitor count -->
+  <div class="status-row">
+    <div class="status-pill">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="rgba(255,70,84,0.8)"><path d="M12.602.222a.504.504 0 0 0-.813.372L11.4 5.28a.504.504 0 0 1-.504.477H6.148a.504.504 0 0 0-.35.863l9.853 9.392a.504.504 0 0 0 .762-.094l4.2-6.804a.504.504 0 0 0-.308-.749L12.602.222zm-1.204 23.556a.504.504 0 0 0 .813-.372l.389-4.686a.504.504 0 0 1 .504-.477h4.748a.504.504 0 0 0 .35-.863L8.349 8.988a.504.504 0 0 0-.762.094l-4.2 6.804a.504.504 0 0 0 .308.749l7.703 7.143z"/></svg>
+      <span id="val-rank" class="pill-val">—</span>
+    </div>
+    <div class="status-pill">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="rgba(91,163,245,0.7)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+      <span id="visitor-label" class="pill-val">visitors</span>
+    </div>
+  </div>
+
+  <!-- currently playing — edit CURRENT_GAME to update -->
+  <div class="playing-card" style="margin-bottom:10px;">
+    <div class="playing-icon" id="game-icon">🎮</div>
+    <div class="playing-text">
+      <span class="playing-label">CURRENTLY PLAYING</span>
+      <span class="playing-game" id="game-name">Valorant</span>
+    </div>
+  </div>
+
   <nav class="links" aria-label="Links">
 
-    <a class="link accent" href="https://twitch.tv/dr1wn" target="_blank" rel="noopener">
+    <a class="link" id="twitch-link" href="https://twitch.tv/dr1wn" target="_blank" rel="noopener">
       <div class="link-icon" style="background:rgba(145,70,255,0.15);">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="rgba(145,70,255,0.9)"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>
       </div>
       <div class="link-text">
-        <span class="link-title"><span class="status-dot"></span>watch live</span>
+        <span class="link-title" id="twitch-label"><span class="status-dot" style="background:rgba(145,70,255,0.5);"></span>twitch</span>
         <span class="link-sub">twitch.tv/dr1wn</span>
       </div>
     </a>
@@ -415,15 +651,6 @@
 
     <div class="divider"></div>
 
-    <!--
-      SPOTIFY / LAST.FM SETUP:
-      1. create a free account at last.fm
-      2. go to last.fm settings → applications → connect spotify
-      3. get a free API key at https://www.last.fm/api/account/create
-      4. replace YOUR_API_KEY_HERE with your key
-      5. replace YOUR_LASTFM_USERNAME_HERE with your last.fm username
-      that's it — it'll show your last played / now playing and update every minute
-    -->
     <div class="link no-arrow" id="spotify-card" onclick="openSpotify()">
       <div class="link-icon" style="background:rgba(29,185,84,0.12);">
         <div class="music-bar" id="music-bars">
@@ -439,6 +666,9 @@
   </nav>
 
   <footer class="footer">
+    <div class="visitor-count">
+      <img src="https://hits.sh/ashsayshii.dev.wales.svg?style=flat-square&color=5ba3f5&label=visitors&labelColor=12121a" alt="visitor count" height="18">
+    </div>
     <p>ashsayshii.dev.wales</p>
   </footer>
 
@@ -447,18 +677,138 @@
 <div class="toast" id="toast">copied sently. ✓</div>
 
 <script>
-  const LASTFM_API_KEY = '6e3b02b4cf0d93cf2b7904d06d432281';
+  // ─── CONFIG ──────────────────────────────────────────────
+  const LASTFM_API_KEY  = '6e3b02b4cf0d93cf2b7904d06d432281';
   const LASTFM_USERNAME = 'yz_o';
 
+  // your valorant name and tag (e.g. name='ashyzh' tag='1234')
+  // find it in-game top right corner: NAME#TAG
+  const VAL_NAME   = 'ash';
+  const VAL_TAG    = 'balls';
+  const VAL_REGION = 'br';
+
+  // currently playing — just edit this manually whenever
+  const CURRENT_GAME      = 'Valorant';
+  const CURRENT_GAME_ICON = '🎮';
+  // ─────────────────────────────────────────────────────────
+
+  document.getElementById('game-name').textContent = CURRENT_GAME;
+  document.getElementById('game-icon').textContent = CURRENT_GAME_ICON;
+
+  // cursor trail
+  const cursor = document.getElementById('cursor');
+  const TRAIL_LENGTH = 12;
+  const trail = [];
+
+  for (let i = 0; i < TRAIL_LENGTH; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'trail-dot';
+    dot.style.opacity = ((TRAIL_LENGTH - i) / TRAIL_LENGTH * 0.5).toString();
+    dot.style.width = dot.style.height = Math.max(2, 6 - i * 0.4) + 'px';
+    document.body.appendChild(dot);
+    trail.push({ el: dot, x: 0, y: 0 });
+  }
+
+  let mouseX = 0, mouseY = 0;
+
+  document.addEventListener('mousemove', e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    cursor.style.left = mouseX + 'px';
+    cursor.style.top  = mouseY + 'px';
+  });
+
+  (function animateTrail() {
+    let x = mouseX, y = mouseY;
+    trail.forEach((dot, i) => {
+      const prev = i === 0 ? { x: mouseX, y: mouseY } : trail[i - 1];
+      dot.x += (prev.x - dot.x) * 0.4;
+      dot.y += (prev.y - dot.y) * 0.4;
+      dot.el.style.left = dot.x + 'px';
+      dot.el.style.top  = dot.y + 'px';
+    });
+    requestAnimationFrame(animateTrail);
+  })();
+
+  // twitch live check via decapi
+  async function checkTwitchLive() {
+    try {
+      const res = await fetch('https://decapi.me/twitch/uptime/dr1wn');
+      const text = await res.text().then(t => t.trim());
+      const isLive = !text.toLowerCase().includes('offline') && !text.toLowerCase().includes('error');
+      const banner = document.getElementById('live-banner');
+      const twitchLink = document.getElementById('twitch-link');
+      const avatarWrap = document.getElementById('avatar-wrap');
+      const pill = document.getElementById('twitch-status-pill');
+      const pillText = document.getElementById('twitch-status-text');
+      const pillDot = document.getElementById('twitch-status-dot');
+
+      if (isLive) {
+        // top banner
+        banner.classList.add('visible');
+        document.getElementById('live-text').textContent = `LIVE — ${text}`;
+        // twitch card
+        twitchLink.classList.add('live-link');
+        document.getElementById('twitch-label').innerHTML =
+          '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#ff4444;margin-right:6px;animation:pulse-red 1.5s ease-in-out infinite;"></span>live now';
+        avatarWrap.classList.add('live');
+        // status pill
+        pill.classList.add('live');
+        pill.classList.remove('offline');
+        pillText.textContent = '🔴 LIVE NOW';
+      } else {
+        pill.classList.add('offline');
+        pill.classList.remove('live');
+        // try to get last vod date
+        try {
+          const vodRes = await fetch('https://decapi.me/twitch/lastvod/dr1wn');
+          const vodText = await vodRes.text().then(t => t.trim());
+          // decapi returns something like "VOD title (2 days ago)"
+          const match = vodText.match(/\((.+?)\)/);
+          pillText.textContent = match ? `last live: ${match[1]}` : 'last live: twitch';
+        } catch {
+          pillText.textContent = 'last live: twitch';
+        }
+      }
+    } catch { /* silently fail */ }
+  }
+
+  // valorant rank via henrik's free API
+  async function fetchValRank() {
+    if (VAL_NAME === 'YOUR_VAL_NAME') {
+      document.getElementById('val-rank').textContent = 'val rank';
+      return;
+    }
+    try {
+      const res = await fetch(
+        `https://api.henrikdev.xyz/valorant/v2/mmr/${VAL_REGION}/${encodeURIComponent(VAL_NAME)}/${encodeURIComponent(VAL_TAG)}`
+      );
+      const data = await res.json();
+      if (data.status !== 200) { document.getElementById('val-rank').textContent = '—'; return; }
+      const tier = data.data.current_data.currenttierpatched || '—';
+      const rr   = data.data.current_data.ranking_in_tier;
+      const tierLower = tier.toLowerCase();
+      let cls = 'rank-iron';
+      if (tierLower.includes('bronze'))    cls = 'rank-bronze';
+      if (tierLower.includes('silver'))    cls = 'rank-silver';
+      if (tierLower.includes('gold'))      cls = 'rank-gold';
+      if (tierLower.includes('platinum'))  cls = 'rank-platinum';
+      if (tierLower.includes('diamond'))   cls = 'rank-diamond';
+      if (tierLower.includes('ascendant')) cls = 'rank-ascendant';
+      if (tierLower.includes('immortal'))  cls = 'rank-immortal';
+      if (tierLower.includes('radiant'))   cls = 'rank-radiant';
+      const el = document.getElementById('val-rank');
+      el.textContent = `${tier} ${rr}RR`;
+      el.className = `pill-val ${cls}`;
+    } catch {
+      document.getElementById('val-rank').textContent = '—';
+    }
+  }
+
+  // spotify / last.fm
   let spotifyUrl = 'https://open.spotify.com';
 
   async function fetchLastPlayed() {
-    if (LASTFM_API_KEY === 'YOUR_API_KEY_HERE') {
-      document.getElementById('song-title').textContent = 'set up last.fm';
-      document.getElementById('song-artist').textContent = 'see code comments ↑';
-      document.getElementById('music-bars').classList.add('paused');
-      return;
-    }
     try {
       const res = await fetch(
         `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${LASTFM_USERNAME}&api_key=${LASTFM_API_KEY}&format=json&limit=1`
@@ -466,19 +816,12 @@
       const data = await res.json();
       const track = data.recenttracks.track[0];
       const isNowPlaying = track['@attr']?.nowplaying === 'true';
-      const title = track.name;
-      const artist = track.artist['#text'];
       spotifyUrl = track.url;
-
-      document.getElementById('song-title').textContent = title;
+      document.getElementById('song-title').textContent = track.name;
       document.getElementById('song-artist').textContent =
-        (isNowPlaying ? '▶  ' : '↺  ') + artist;
-
-      if (!isNowPlaying) {
-        document.getElementById('music-bars').classList.add('paused');
-      } else {
-        document.getElementById('music-bars').classList.remove('paused');
-      }
+        (isNowPlaying ? '▶  ' : '↺  ') + track.artist['#text'];
+      const bars = document.getElementById('music-bars');
+      isNowPlaying ? bars.classList.remove('paused') : bars.classList.add('paused');
     } catch {
       document.getElementById('song-title').textContent = 'music';
       document.getElementById('song-artist').textContent = 'spotify';
@@ -486,9 +829,7 @@
     }
   }
 
-  function openSpotify() {
-    window.open(spotifyUrl, '_blank', 'noopener');
-  }
+  function openSpotify() { window.open(spotifyUrl, '_blank', 'noopener'); }
 
   function copyDiscord() {
     navigator.clipboard.writeText('sently.').then(() => {
@@ -498,8 +839,12 @@
     });
   }
 
+  // init
+  checkTwitchLive();
+  fetchValRank();
   fetchLastPlayed();
   setInterval(fetchLastPlayed, 60000);
+  setInterval(checkTwitchLive, 120000);
 </script>
 </body>
 </html>
