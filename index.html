@@ -93,16 +93,17 @@
     z-index: 1;
   }
 
-  .avatar img {
+  .avatar video {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    display: none;
+    border-radius: 50%;
+    display: block;
+    position: relative;
+    z-index: 1;
   }
 
-  .avatar img.loaded { display: block; }
-  .avatar .initials { position: absolute; }
-  .avatar img.loaded + .initials { display: none; }
+  .avatar .initials { display: none; }
 
   .name {
     font-size: 2rem;
@@ -347,8 +348,8 @@
   <header class="header">
     <div class="avatar-wrap">
       <div class="avatar">
-        <!-- paste your pfp direct URL as src here -->
-        <img src="" alt="ashlyzh avatar" onload="this.classList.add('loaded')">
+        <!-- rename your video to pfp.mp4 and upload it to the repo root -->
+        <video src="pfp.mp4" autoplay loop muted playsinline></video>
         <span class="initials">az</span>
       </div>
     </div>
