@@ -786,6 +786,7 @@
   const VAL_NAME   = 'ash';
   const VAL_TAG    = 'balls';
   const VAL_REGION = 'br';
+  const HENRIK_KEY = 'HDEV-94d937fe-555f-4c26-b01e-2a5e08975785';
 
   const CURRENT_GAME      = 'Valorant';
   const CURRENT_GAME_ICON = '🎮';
@@ -890,20 +891,20 @@
     try {
       // try v3 first (latest henrik endpoint)
       let res = await fetch(
-        `https://api.henrikdev.xyz/valorant/v3/mmr/${VAL_REGION}/pc/${encodeURIComponent(VAL_NAME)}/${encodeURIComponent(VAL_TAG)}`
+        `https://api.henrikdev.xyz/valorant/v3/mmr/${VAL_REGION}/pc/${encodeURIComponent(VAL_NAME)}/${encodeURIComponent(VAL_TAG)}`,
+        { headers: { 'Authorization': HENRIK_KEY } }
       );
       let data = await res.json();
 
       let tier, rr;
 
       if (data.status === 200 && data.data?.current) {
-        // v3 structure
         tier = data.data.current.tier?.name || '—';
         rr   = data.data.current.rr ?? '';
       } else {
-        // fallback to v2
         res  = await fetch(
-          `https://api.henrikdev.xyz/valorant/v2/mmr/${VAL_REGION}/${encodeURIComponent(VAL_NAME)}/${encodeURIComponent(VAL_TAG)}`
+          `https://api.henrikdev.xyz/valorant/v2/mmr/${VAL_REGION}/${encodeURIComponent(VAL_NAME)}/${encodeURIComponent(VAL_TAG)}`,
+          { headers: { 'Authorization': HENRIK_KEY } }
         );
         data = await res.json();
         if (data.status === 200 && data.data?.current_data) {
