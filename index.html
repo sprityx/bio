@@ -765,8 +765,8 @@ body::before {
         pill.classList.add('live');txt.textContent='🔴 LIVE NOW';
       } else {
         pill.classList.remove('live');
-        try{const vt=(await(await fetch('https://decapi.me/twitch/videos/dr1wn?limit=1&offset=0')).text()).trim();const parts=vt.split('|');const ago=parts.length>=3?timeAgo(parts[2].trim()):null;txt.textContent=ago?`Last live: ${ago}`:'Offline';}
-        catch{txt.textContent='Offline';}
+        try{const vt=(await(await fetch('https://decapi.me/twitch/videos/dr1wn?limit=1&offset=0')).text()).trim();const parts=vt.split('|');const ago=parts.length>=3?timeAgo(parts[2].trim()):null;txt.textContent=ago?`Last live: ${ago}`:'Last live: recently';}
+        catch{txt.textContent='Last live: recently';}
       }
     }catch{txt.textContent='Offline';}
   }
@@ -806,9 +806,18 @@ body::before {
   function openSpotify(){window.open(spotifyUrl,'_blank','noopener');}
 
   function copyDiscord(){
-    navigator.clipboard.writeText('sently.').then(()=>{
-      const t=document.getElementById('toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);
-    });
+    const text='sently.';
+    function showToast(){const t=document.getElementById('toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
+    if(navigator.clipboard&&window.isSecureContext){
+      navigator.clipboard.writeText(text).then(showToast).catch(fallback);
+    } else { fallback(); }
+    function fallback(){
+      const el=document.createElement('textarea');
+      el.value=text;el.style.cssText='position:fixed;opacity:0;top:0;left:0;';
+      document.body.appendChild(el);el.focus();el.select();
+      try{document.execCommand('copy');showToast();}catch{}
+      document.body.removeChild(el);
+    }
   }
 
   // comments
