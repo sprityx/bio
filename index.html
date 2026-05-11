@@ -3,641 +3,429 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ashlyzh</title>
+<title>ashlyzh — webdev & design</title>
+<meta name="description" content="Webdev, designer & streamer. Available for freelance projects.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --bg: #0a0a0f;
-    --surface: #12121a;
-    --border: rgba(255,255,255,0.07);
-    --border-hover: rgba(255,255,255,0.18);
-    --text: #f0eee8;
-    --muted: #7a7870;
-    --accent: #5ba3f5;
-    --accent-dim: rgba(91,163,245,0.12);
-  }
-
-  html, body {
-    min-height: 100vh;
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Syne', sans-serif;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem 1rem;
-    cursor: none;
-  }
-
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 80% 60% at 50% -10%, rgba(91,163,245,0.08) 0%, transparent 60%),
-      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.02) 40px),
-      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.02) 40px);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* cursor */
-  #cursor {
-    position: fixed;
-    width: 10px;
-    height: 10px;
-    background: var(--accent);
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 9999;
-    transform: translate(-50%, -50%);
-    transition: transform 0.1s, opacity 0.1s;
-    mix-blend-mode: screen;
-  }
-
-  .trail-dot {
-    position: fixed;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 9998;
-    transform: translate(-50%, -50%);
-    background: var(--accent);
-    mix-blend-mode: screen;
-  }
-
-  .container {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    max-width: 420px;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .header {
-    text-align: center;
-    padding-bottom: 2rem;
-  }
-
-  /* live banner above avatar */
-  .live-banner {
-    display: none;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    margin-bottom: 0.75rem;
-    padding: 4px 14px;
-    background: rgba(145,70,255,0.15);
-    border: 1px solid rgba(145,70,255,0.3);
-    border-radius: 999px;
-    font-family: 'Space Mono', monospace;
-    font-size: 0.68rem;
-    letter-spacing: 0.08em;
-    color: rgba(200,170,255,0.9);
-    width: fit-content;
-    margin-left: auto;
-    margin-right: auto;
-    cursor: pointer;
-    text-decoration: none;
-  }
-
-  .live-banner.visible { display: flex; }
-
-  .live-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: #ff4444;
-    animation: pulse-red 1.5s ease-in-out infinite;
-    flex-shrink: 0;
-  }
-
-  @keyframes pulse-red {
-    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(255,68,68,0.4); }
-    50% { opacity: 0.8; box-shadow: 0 0 0 4px rgba(255,68,68,0); }
-  }
-
-  .avatar-wrap {
-    width: 88px;
-    height: 88px;
-    margin: 0 auto 1.25rem;
-    position: relative;
-  }
-
-  .avatar-wrap::before {
-    content: '';
-    position: absolute;
-    inset: -3px;
-    border-radius: 50%;
-    background: conic-gradient(var(--accent) 0deg, transparent 120deg, transparent 240deg, var(--accent) 360deg);
-    animation: spin 8s linear infinite;
-  }
-
-  /* when live, ring turns purple */
-  .avatar-wrap.live::before {
-    background: conic-gradient(rgba(145,70,255,0.9) 0deg, transparent 120deg, transparent 240deg, rgba(145,70,255,0.9) 360deg);
-  }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  .avatar {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    background: var(--surface);
-    border: 3px solid var(--bg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Space Mono', monospace;
-    font-size: 22px;
-    color: var(--accent);
-    letter-spacing: -1px;
-    overflow: hidden;
-    z-index: 1;
-  }
-
-  .avatar video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 50%;
-    display: block;
-    position: relative;
-    z-index: 1;
-  }
-
-  .avatar .initials { display: none; }
-
-  .name {
-    font-size: 2rem;
-    font-weight: 800;
-    letter-spacing: -0.03em;
-    line-height: 1;
-    margin-bottom: 0.4rem;
-  }
-
-  .name span { color: var(--accent); }
-
-  .handle {
-    font-family: 'Space Mono', monospace;
-    font-size: 0.75rem;
-    color: var(--muted);
-    letter-spacing: 0.08em;
-  }
-
-  .bio {
-    margin-top: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    align-items: center;
-  }
-
-  .bio-line {
-    font-size: 0.82rem;
-    color: rgba(240,238,232,0.55);
-    font-family: 'Space Mono', monospace;
-    letter-spacing: 0.03em;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .bio-line .dot { color: var(--accent); opacity: 0.5; font-size: 0.6rem; }
-  .bio-accent { color: rgba(91,163,245,0.8); }
-
-  .tags {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin-top: 0.9rem;
-  }
-
-  .tag {
-    font-family: 'Space Mono', monospace;
-    font-size: 0.65rem;
-    letter-spacing: 0.05em;
-    padding: 3px 10px;
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    color: var(--muted);
-    background: var(--surface);
-  }
-
-  /* status row — val rank + visitor count */
-  .status-row {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 0.5rem;
-  }
-
-  .status-pill {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 7px;
-    padding: 9px 12px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    font-family: 'Space Mono', monospace;
-    font-size: 0.7rem;
-    color: var(--muted);
-  }
-
-  .status-pill .pill-val {
-    font-weight: 700;
-    font-family: 'Syne', sans-serif;
-    font-size: 0.8rem;
-    color: var(--text);
-  }
-
-  /* currently playing */
-  .playing-card {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    margin-bottom: 0;
-  }
-
-  .playing-icon {
-    font-size: 1.3rem;
-    flex-shrink: 0;
-    width: 32px;
-    text-align: center;
-  }
-
-  .playing-text {
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-    min-width: 0;
-  }
-
-  .playing-label {
-    font-family: 'Space Mono', monospace;
-    font-size: 0.62rem;
-    color: var(--muted);
-    letter-spacing: 0.06em;
-  }
-
-  .playing-game {
-    font-size: 0.88rem;
-    font-weight: 700;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .links {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .link {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 14px 18px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    text-decoration: none;
-    color: var(--text);
-    font-size: 0.9rem;
-    font-weight: 700;
-    transition: border-color 0.2s, background 0.2s, transform 0.15s;
-    position: relative;
-    overflow: hidden;
-    cursor: none;
-  }
-
-  .link::after {
-    content: '↗';
-    position: absolute;
-    right: 18px;
-    font-size: 0.8rem;
-    color: var(--muted);
-    transition: color 0.2s, transform 0.2s;
-    font-family: 'Space Mono', monospace;
-  }
-
-  .link.no-arrow::after { display: none; }
-
-  .link:hover {
-    border-color: var(--border-hover);
-    background: rgba(255,255,255,0.04);
-    transform: translateY(-1px);
-  }
-
-  .link:hover::after {
-    color: var(--accent);
-    transform: translate(2px, -2px);
-  }
-
-  .link.accent {
-    border-color: rgba(91,163,245,0.25);
-    background: var(--accent-dim);
-  }
-
-  .link.accent:hover {
-    border-color: rgba(91,163,245,0.5);
-    background: rgba(91,163,245,0.18);
-  }
-
-  .link.live-link {
-    border-color: rgba(145,70,255,0.3);
-    background: rgba(145,70,255,0.08);
-  }
-
-  .link.live-link:hover {
-    border-color: rgba(145,70,255,0.6);
-    background: rgba(145,70,255,0.15);
-  }
-
-  .link-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-
-  .link-text {
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-    min-width: 0;
-    flex: 1;
-  }
-
-  .link-title { font-size: 0.88rem; font-weight: 700; }
-
-  .link-sub {
-    font-size: 0.72rem;
-    color: var(--muted);
-    font-family: 'Space Mono', monospace;
-    font-weight: 400;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .divider {
-    height: 1px;
-    background: var(--border);
-    margin: 0.25rem 0;
-  }
-
-  .footer {
-    text-align: center;
-    margin-top: 2rem;
-    font-family: 'Space Mono', monospace;
-    font-size: 0.65rem;
-    color: rgba(122,120,112,0.5);
-    letter-spacing: 0.05em;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    align-items: center;
-  }
-
-  .visitor-count img { opacity: 0.4; }
-
-  .status-dot {
-    display: inline-block;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--accent);
-    margin-right: 6px;
-    animation: pulse 2s ease-in-out infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-  }
-
-  .music-bar {
-    display: flex;
-    align-items: center;
-    gap: 3px;
-  }
-
-  .music-bar span {
-    display: block;
-    width: 3px;
-    border-radius: 2px;
-    background: #1DB954;
-    animation: bar 1.2s ease-in-out infinite;
-  }
-
-  .music-bar span:nth-child(1) { height: 10px; animation-delay: 0s; }
-  .music-bar span:nth-child(2) { height: 16px; animation-delay: 0.2s; }
-  .music-bar span:nth-child(3) { height: 8px; animation-delay: 0.4s; }
-  .music-bar span:nth-child(4) { height: 14px; animation-delay: 0.1s; }
-
-  @keyframes bar {
-    0%, 100% { transform: scaleY(0.4); }
-    50% { transform: scaleY(1); }
-  }
-
-  .music-bar.paused span { animation: none; transform: scaleY(0.4); opacity: 0.4; }
-
-  .toast {
-    position: fixed;
-    bottom: 1.5rem;
-    left: 50%;
-    transform: translateX(-50%) translateY(20px);
-    background: var(--surface);
-    border: 1px solid var(--border-hover);
-    color: var(--text);
-    font-family: 'Space Mono', monospace;
-    font-size: 0.75rem;
-    padding: 8px 18px;
-    border-radius: 999px;
-    opacity: 0;
-    transition: opacity 0.2s, transform 0.2s;
-    pointer-events: none;
-    z-index: 100;
-  }
-
-  .toast.show {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
-
-  /* twitch status pill */
-  .twitch-status-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    padding: 5px 14px;
-    border-radius: 999px;
-    font-family: 'Space Mono', monospace;
-    font-size: 0.7rem;
-    letter-spacing: 0.06em;
-    text-decoration: none;
-    font-weight: 700;
-    transition: opacity 0.2s;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--muted);
-  }
-
-  .twitch-status-pill:hover { opacity: 0.75; }
-
-  .twitch-status-pill.live {
-    background: rgba(145,70,255,0.15);
-    border-color: rgba(145,70,255,0.35);
-    color: rgba(200,170,255,0.95);
-  }
-
-  .twitch-status-pill.offline {
-    background: var(--surface);
-    border-color: var(--border);
-    color: var(--muted);
-  }
-
-  .twitch-status-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    flex-shrink: 0;
-    background: var(--muted);
-  }
-
-  .twitch-status-pill.live .twitch-status-dot {
-    background: #ff4444;
-    animation: pulse-red 1.5s ease-in-out infinite;
-  }
-
-  .twitch-status-pill.offline .twitch-status-dot {
-    background: var(--muted);
-    animation: none;
-  }
-  /* comments panel */
-  .comments-panel {
-    display: none;
-    flex-direction: column;
-    gap: 10px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 14px;
-    margin-bottom: 10px;
-    animation: slideDown 0.2s ease;
-  }
-  .comments-panel.open { display: flex; }
-  @keyframes slideDown {
-    from { opacity: 0; transform: translateY(-6px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  .comments-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    max-height: 180px;
-    overflow-y: auto;
-  }
-  .comments-list::-webkit-scrollbar { width: 3px; }
-  .comments-list::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 99px; }
-  .comment-item {
-    padding: 8px 10px;
-    background: rgba(255,255,255,0.03);
-    border-radius: 8px;
-    border: 1px solid var(--border);
-  }
-  .comment-author {
-    font-size: 0.72rem;
-    font-weight: 700;
-    color: var(--accent);
-    font-family: 'Space Mono', monospace;
-  }
-  .comment-text {
-    font-size: 0.82rem;
-    color: rgba(240,238,232,0.75);
-    line-height: 1.4;
-    margin-top: 2px;
-  }
-  .comment-time {
-    font-size: 0.6rem;
-    color: var(--muted);
-    font-family: 'Space Mono', monospace;
-    margin-top: 3px;
-  }
-  .comments-empty {
-    font-family: 'Space Mono', monospace;
-    font-size: 0.72rem;
-    color: var(--muted);
-    text-align: center;
-    padding: 8px 0;
-  }
-  .comment-form {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-  }
-  .comment-input {
-    flex: 1;
-    min-width: 80px;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 8px 10px;
-    color: var(--text);
-    font-family: 'Space Mono', monospace;
-    font-size: 0.72rem;
-    outline: none;
-    transition: border-color 0.2s;
-    cursor: none;
-  }
-  .comment-input:focus { border-color: var(--accent); }
-  .comment-input::placeholder { color: var(--muted); }
-  .comment-submit {
-    background: var(--accent-dim);
-    border: 1px solid rgba(91,163,245,0.25);
-    border-radius: 8px;
-    padding: 8px 14px;
-    color: var(--accent);
-    font-family: 'Space Mono', monospace;
-    font-size: 0.72rem;
-    font-weight: 700;
-    cursor: none;
-    transition: background 0.2s;
-  }
-  .comment-submit:hover { background: rgba(91,163,245,0.2); }
-  .rank-iron     { color: #9e9e9e; }
-  .rank-bronze   { color: #cd7f32; }
-  .rank-silver   { color: #c0c0c0; }
-  .rank-gold     { color: #ffd700; }
-  .rank-platinum { color: #00e5ff; }
-  .rank-diamond  { color: #b388ff; }
-  .rank-ascendant{ color: #69f0ae; }
-  .rank-immortal { color: #ff5252; }
-  .rank-radiant  { color: #ffd740; }
-
-  @media (prefers-reduced-motion: reduce) {
-    .avatar-wrap::before, .status-dot, .music-bar span, .live-dot { animation: none; }
-    .link { transition: none; }
-  }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #090910;
+  --surface: #111118;
+  --surface2: #18181f;
+  --border: rgba(255,255,255,0.06);
+  --border-hover: rgba(255,255,255,0.14);
+  --text: #eeecea;
+  --muted: #6a6870;
+  --accent: #5ba3f5;
+  --accent-dim: rgba(91,163,245,0.1);
+}
+
+html, body {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Syne', sans-serif;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 2.5rem 1rem 3rem;
+  cursor: none;
+}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background: radial-gradient(ellipse 70% 45% at 50% -5%, rgba(91,163,245,0.07) 0%, transparent 55%);
+  pointer-events: none; z-index: 0;
+}
+
+#cursor {
+  position: fixed; width: 9px; height: 9px;
+  background: var(--accent); border-radius: 50%;
+  pointer-events: none; z-index: 9999;
+  transform: translate(-50%,-50%); mix-blend-mode: screen;
+}
+.trail-dot {
+  position: fixed; border-radius: 50%;
+  pointer-events: none; z-index: 9998;
+  transform: translate(-50%,-50%);
+  background: var(--accent); mix-blend-mode: screen;
+}
+
+/* ── main layout ── */
+.container {
+  position: relative; z-index: 1;
+  width: 100%; max-width: 420px;
+  display: flex; flex-direction: column; gap: 0;
+}
+
+/* ── header (always visible) ── */
+.header {
+  text-align: center;
+  padding-bottom: 1.4rem;
+}
+
+.live-banner {
+  display: none; align-items: center; justify-content: center;
+  gap: 6px; margin: 0 auto 0.7rem;
+  padding: 3px 13px;
+  background: rgba(145,70,255,0.12);
+  border: 1px solid rgba(145,70,255,0.28);
+  border-radius: 999px;
+  font-family: 'Space Mono', monospace; font-size: 0.65rem;
+  letter-spacing: 0.08em; color: rgba(200,170,255,0.9);
+  width: fit-content; text-decoration: none;
+}
+.live-banner.visible { display: flex; }
+
+.avatar-wrap {
+  width: 84px; height: 84px;
+  margin: 0 auto 1rem; position: relative;
+}
+.avatar-wrap::before {
+  content: ''; position: absolute; inset: -3px; border-radius: 50%;
+  background: conic-gradient(var(--accent) 0deg, transparent 110deg, transparent 250deg, var(--accent) 360deg);
+  animation: spin 8s linear infinite;
+}
+.avatar-wrap.live::before {
+  background: conic-gradient(rgba(145,70,255,0.9) 0deg, transparent 110deg, transparent 250deg, rgba(145,70,255,0.9) 360deg);
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.avatar {
+  position: relative; width: 100%; height: 100%;
+  border-radius: 50%; background: var(--surface);
+  border: 3px solid var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Space Mono', monospace; font-size: 20px; color: var(--accent);
+  overflow: hidden; z-index: 1;
+}
+.avatar video { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+.avatar .initials { display: none; }
+
+.name {
+  font-size: 1.9rem; font-weight: 800;
+  letter-spacing: -0.03em; line-height: 1;
+  margin-bottom: 0.3rem;
+}
+.name span { color: var(--accent); }
+
+.handle {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.68rem; color: var(--muted); letter-spacing: 0.07em;
+}
+
+.roles {
+  display: flex; gap: 6px; flex-wrap: wrap;
+  justify-content: center; margin-top: 0.8rem;
+}
+.role {
+  font-family: 'Space Mono', monospace; font-size: 0.67rem;
+  letter-spacing: 0.04em; padding: 4px 12px;
+  border-radius: 999px; font-weight: 700;
+}
+.role-primary {
+  background: var(--accent-dim);
+  border: 1px solid rgba(91,163,245,0.22);
+  color: rgba(91,163,245,0.9);
+}
+.role-secondary {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+
+.available-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  margin-top: 0.65rem;
+  font-family: 'Space Mono', monospace; font-size: 0.63rem;
+  letter-spacing: 0.05em; color: rgba(110,210,130,0.85);
+  background: rgba(110,210,130,0.07);
+  border: 1px solid rgba(110,210,130,0.18);
+  padding: 3px 12px; border-radius: 999px;
+}
+.available-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: #6ed282; animation: pulse-g 2s ease-in-out infinite;
+}
+@keyframes pulse-g { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+/* twitch status */
+.twitch-pill {
+  display: inline-flex; align-items: center; gap: 7px;
+  margin-top: 0.7rem; padding: 4px 14px; border-radius: 999px;
+  font-family: 'Space Mono', monospace; font-size: 0.67rem;
+  letter-spacing: 0.05em; font-weight: 700;
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--muted); text-decoration: none; transition: opacity 0.2s;
+}
+.twitch-pill:hover { opacity: 0.7; }
+.twitch-pill.live {
+  background: rgba(145,70,255,0.12); border-color: rgba(145,70,255,0.3);
+  color: rgba(200,170,255,0.92);
+}
+.twitch-dot {
+  width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; background: var(--muted);
+}
+.twitch-pill.live .twitch-dot { background: #ff4444; animation: pulse-r 1.5s ease-in-out infinite; }
+@keyframes pulse-r { 0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(255,68,68,0.35);}50%{opacity:.8;box-shadow:0 0 0 4px rgba(255,68,68,0);} }
+
+/* ── tab switcher ── */
+.tab-bar {
+  display: flex; position: relative;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 4px;
+  margin-bottom: 12px;
+}
+.tab-indicator {
+  position: absolute; top: 4px; bottom: 4px;
+  width: calc(50% - 4px);
+  background: var(--surface2); border: 1px solid var(--border-hover);
+  border-radius: 9px;
+  transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+.tab-indicator.right { transform: translateX(calc(100% + 0px)); }
+
+.tab-btn {
+  flex: 1; padding: 9px 0;
+  background: transparent; border: none;
+  font-family: 'Syne', sans-serif; font-size: 0.82rem; font-weight: 700;
+  color: var(--muted); cursor: none; position: relative; z-index: 1;
+  transition: color 0.2s; letter-spacing: 0.01em; border-radius: 8px;
+}
+.tab-btn.active { color: var(--text); }
+
+/* ── sliding panels ── */
+.panels-viewport { overflow: hidden; width: 100%; }
+.panels-track {
+  display: flex; width: 200%;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.panels-track.show-portfolio { transform: translateX(-50%); }
+.panel { width: 50%; display: flex; flex-direction: column; gap: 10px; }
+
+/* ── about panel ── */
+.about-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 16px 18px;
+}
+.about-card p {
+  font-size: 0.85rem; color: rgba(238,236,234,0.6);
+  line-height: 1.7; font-family: 'Space Mono', monospace;
+}
+.about-card p span { color: var(--accent); font-weight: 700; }
+
+/* status row */
+.status-row { display: flex; gap: 8px; }
+.status-pill {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  gap: 7px; padding: 10px 10px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; font-family: 'Space Mono', monospace;
+  font-size: 0.66rem; color: var(--muted);
+}
+.status-pill .pill-val {
+  font-weight: 700; font-family: 'Syne', sans-serif;
+  font-size: 0.77rem; color: var(--text);
+}
+#visitors-pill { cursor: none; transition: border-color 0.2s; }
+#visitors-pill:hover { border-color: var(--border-hover); }
+
+/* comments */
+.comments-panel {
+  display: none; flex-direction: column; gap: 10px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 13px;
+  animation: fadeSlide 0.18s ease;
+}
+.comments-panel.open { display: flex; }
+@keyframes fadeSlide {
+  from { opacity:0; transform:translateY(-5px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.comments-list {
+  display: flex; flex-direction: column; gap: 7px;
+  max-height: 160px; overflow-y: auto;
+}
+.comments-list::-webkit-scrollbar { width: 3px; }
+.comments-list::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 99px; }
+.comment-item {
+  padding: 8px 10px; background: rgba(255,255,255,0.025);
+  border-radius: 8px; border: 1px solid var(--border);
+}
+.comment-author { font-size: 0.7rem; font-weight: 700; color: var(--accent); font-family: 'Space Mono', monospace; }
+.comment-text { font-size: 0.79rem; color: rgba(238,236,234,0.68); line-height: 1.4; margin-top: 2px; }
+.comment-time { font-size: 0.58rem; color: var(--muted); font-family: 'Space Mono', monospace; margin-top: 3px; }
+.comments-empty { font-family: 'Space Mono', monospace; font-size: 0.7rem; color: var(--muted); text-align: center; padding: 6px 0; }
+.comment-form { display: flex; gap: 6px; flex-wrap: wrap; }
+.comment-input {
+  flex: 1; min-width: 80px;
+  background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+  border-radius: 8px; padding: 8px 10px; color: var(--text);
+  font-family: 'Space Mono', monospace; font-size: 0.7rem;
+  outline: none; transition: border-color 0.2s; cursor: none;
+}
+.comment-input:focus { border-color: var(--accent); }
+.comment-input::placeholder { color: var(--muted); }
+.comment-submit {
+  background: var(--accent-dim); border: 1px solid rgba(91,163,245,0.2);
+  border-radius: 8px; padding: 8px 14px; color: var(--accent);
+  font-family: 'Space Mono', monospace; font-size: 0.7rem; font-weight: 700;
+  cursor: none; transition: background 0.2s;
+}
+.comment-submit:hover { background: rgba(91,163,245,0.18); }
+
+/* playing */
+.playing-card {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 15px; background: var(--surface);
+  border: 1px solid var(--border); border-radius: 12px;
+}
+.playing-icon { font-size: 1.2rem; flex-shrink: 0; width: 30px; text-align: center; }
+.playing-label { font-family: 'Space Mono', monospace; font-size: 0.59rem; color: var(--muted); letter-spacing: 0.06em; }
+.playing-game { font-size: 0.85rem; font-weight: 700; margin-top: 1px; }
+
+/* section label */
+.section-label {
+  font-family: 'Space Mono', monospace; font-size: 0.62rem;
+  letter-spacing: 0.1em; color: var(--muted);
+  display: flex; align-items: center; gap: 10px;
+}
+.section-label::after { content:''; flex:1; height:1px; background: var(--border); }
+
+/* links */
+.links { display: flex; flex-direction: column; gap: 8px; }
+.link {
+  display: flex; align-items: center; gap: 13px;
+  padding: 12px 15px; background: var(--surface);
+  border: 1px solid var(--border); border-radius: 12px;
+  text-decoration: none; color: var(--text);
+  font-size: 0.85rem; font-weight: 700;
+  transition: border-color 0.2s, background 0.2s, transform 0.15s;
+  position: relative; cursor: none;
+}
+.link::after {
+  content: '↗'; position: absolute; right: 15px;
+  font-size: 0.72rem; color: var(--muted);
+  transition: color 0.2s, transform 0.2s;
+  font-family: 'Space Mono', monospace;
+}
+.link.no-arrow::after { display: none; }
+.link:hover { border-color: var(--border-hover); background: rgba(255,255,255,0.025); transform: translateY(-1px); }
+.link:hover::after { color: var(--accent); transform: translate(2px,-2px); }
+.link.live-link { border-color: rgba(145,70,255,0.26); background: rgba(145,70,255,0.06); }
+.link-icon { width: 30px; height: 30px; border-radius: 7px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.link-text { display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1; }
+.link-title { font-size: 0.84rem; font-weight: 700; }
+.link-sub { font-size: 0.69rem; color: var(--muted); font-family: 'Space Mono', monospace; font-weight: 400; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.divider { height: 1px; background: var(--border); }
+
+.music-bar { display: flex; align-items: center; gap: 3px; }
+.music-bar span { display: block; width: 3px; border-radius: 2px; background: #1DB954; animation: bar 1.2s ease-in-out infinite; }
+.music-bar span:nth-child(1){height:10px;animation-delay:0s;}
+.music-bar span:nth-child(2){height:15px;animation-delay:.2s;}
+.music-bar span:nth-child(3){height:8px;animation-delay:.4s;}
+.music-bar span:nth-child(4){height:13px;animation-delay:.1s;}
+@keyframes bar{0%,100%{transform:scaleY(.4);}50%{transform:scaleY(1);}}
+.music-bar.paused span{animation:none;transform:scaleY(.4);opacity:.4;}
+
+/* ── portfolio panel ── */
+.portfolio-grid { display: flex; flex-direction: column; gap: 9px; }
+
+.project-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; overflow: hidden;
+  transition: border-color 0.2s, transform 0.15s;
+}
+.project-card:hover { border-color: var(--border-hover); transform: translateY(-1px); }
+
+.mockup-wrap { height: 118px; overflow: hidden; position: relative; }
+.browser-bar {
+  height: 22px; display: flex; align-items: center;
+  padding: 0 9px; gap: 5px; position: relative; z-index: 2;
+}
+.browser-bar::before { content:''; position:absolute; inset:0; background:rgba(0,0,0,0.4); backdrop-filter:blur(3px); }
+.bdot { width: 7px; height: 7px; border-radius: 50%; position: relative; z-index: 1; }
+.mockup-content { position: absolute; inset: 0; padding-top: 22px; }
+
+/* salon */
+.mockup-salon { background: linear-gradient(135deg, #2a1828 0%, #1a0f1a 100%); }
+.salon-hero { height:60px; background: linear-gradient(135deg,#3d1f3a,#2a1030); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; border-bottom:1px solid rgba(255,150,200,0.1); }
+.salon-logo { width:40px;height:5px;background:linear-gradient(90deg,#f4a0c8,#c96ba0);border-radius:3px; }
+.salon-sub { width:58px;height:3px;background:rgba(244,160,200,0.2);border-radius:2px; }
+.salon-cards { display:flex;gap:5px;padding:7px; }
+.salon-card { flex:1;height:18px;border-radius:4px;background:rgba(244,160,200,0.07);border:1px solid rgba(244,160,200,0.11); }
+
+/* detailing */
+.mockup-detail { background: linear-gradient(135deg,#0d1117,#161b22); }
+.detail-hero { height:60px;background:linear-gradient(135deg,#0d1117,#1a1f26);position:relative;overflow:hidden;display:flex;align-items:center;padding:0 10px;border-bottom:1px solid rgba(255,100,30,0.1); }
+.detail-hero::before { content:'';position:absolute;right:-10px;top:-20px;width:75px;height:75px;border-radius:50%;background:radial-gradient(circle,rgba(255,100,30,0.14) 0%,transparent 70%); }
+.detail-title { width:52px;height:5px;background:linear-gradient(90deg,#ff6420,#ff8c42);border-radius:3px; }
+.detail-sub { position:absolute;bottom:9px;left:10px;width:32px;height:3px;background:rgba(255,100,30,0.28);border-radius:2px; }
+.detail-cta { position:absolute;right:10px;bottom:9px;width:38px;height:14px;border-radius:4px;background:rgba(255,100,30,0.78); }
+.detail-services { display:flex;gap:5px;padding:7px; }
+.detail-srv { flex:1;height:16px;border-radius:4px;background:rgba(255,100,30,0.05);border:1px solid rgba(255,100,30,0.09); }
+
+/* law */
+.mockup-law { background: linear-gradient(135deg,#0d1220,#0a0f1a); }
+.law-nav { height:20px;background:rgba(10,15,26,0.9);display:flex;align-items:center;padding:0 9px;gap:8px;border-bottom:1px solid rgba(200,168,75,0.11); }
+.law-logo-bar { width:26px;height:4px;background:linear-gradient(90deg,#c8a84b,#a8883b);border-radius:2px; }
+.law-nav-links { display:flex;gap:5px;margin-left:auto; }
+.law-nav-link { width:16px;height:3px;background:rgba(200,168,75,0.18);border-radius:2px; }
+.law-hero { height:40px;background:linear-gradient(180deg,#111d35,#0d1525);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;border-bottom:1px solid rgba(200,168,75,0.07); }
+.law-title { width:76px;height:5px;background:linear-gradient(90deg,#c8a84b,#d4b860);border-radius:3px; }
+.law-sub { width:52px;height:3px;background:rgba(200,168,75,0.18);border-radius:2px; }
+.law-body { display:flex;gap:5px;padding:7px; }
+.law-col { flex:1;height:13px;border-radius:3px;background:rgba(200,168,75,0.03);border:1px solid rgba(200,168,75,0.07); }
+
+.project-info { padding: 11px 13px 13px; }
+.project-header { display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px; }
+.project-name { font-size: 0.88rem; font-weight: 800; }
+.project-type { font-family:'Space Mono',monospace;font-size:0.59rem;letter-spacing:0.04em;padding:2px 8px;border-radius:999px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);white-space:nowrap; }
+.project-desc { font-size:0.77rem;color:rgba(238,236,234,0.48);line-height:1.5;margin-bottom:7px; }
+.project-tags { display:flex;gap:4px;flex-wrap:wrap; }
+.project-tag { font-family:'Space Mono',monospace;font-size:0.58rem;color:var(--muted);padding:2px 7px;border:1px solid var(--border);border-radius:4px;background:var(--surface2); }
+
+/* rank colors */
+.rank-iron{color:#9e9e9e;}.rank-bronze{color:#cd7f32;}.rank-silver{color:#c0c0c0;}
+.rank-gold{color:#ffd700;}.rank-platinum{color:#00e5ff;}.rank-diamond{color:#b388ff;}
+.rank-ascendant{color:#69f0ae;}.rank-immortal{color:#ff5252;}.rank-radiant{color:#ffd740;}
+
+/* ── footer ── */
+.footer {
+  text-align: center; margin-top: 1.5rem;
+  font-family: 'Space Mono', monospace; font-size: 0.6rem;
+  color: rgba(106,104,112,0.4); letter-spacing: 0.05em;
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+}
+.footer img { opacity: 0.32; }
+
+.toast {
+  position: fixed; bottom: 1.5rem; left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--surface); border: 1px solid var(--border-hover);
+  color: var(--text); font-family: 'Space Mono', monospace;
+  font-size: 0.7rem; padding: 7px 16px; border-radius: 999px;
+  opacity: 0; transition: opacity 0.2s, transform 0.2s;
+  pointer-events: none; z-index: 200;
+}
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* ── mobile ── */
+@media (max-width: 480px) {
+  html, body { padding: 1.5rem 0.75rem 2.5rem; cursor: auto; }
+  #cursor, .trail-dot { display: none; }
+  .name { font-size: 1.6rem; }
+  .comment-input, .comment-submit { font-size: 16px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .avatar-wrap::before,.available-dot,.twitch-dot,.music-bar span { animation:none; }
+  .link,.project-card,.panels-track { transition:none; }
+}
 </style>
 </head>
 <body>
@@ -646,10 +434,11 @@
 
 <main class="container" role="main">
 
+  <!-- always-visible header -->
   <header class="header">
 
     <a class="live-banner" id="live-banner" href="https://twitch.tv/dr1wn" target="_blank" rel="noopener">
-      <span class="live-dot"></span>
+      <span style="width:6px;height:6px;border-radius:50%;background:#ff4444;flex-shrink:0;animation:pulse-r 1.5s ease-in-out infinite;"></span>
       <span id="live-text">LIVE NOW</span>
     </a>
 
@@ -663,403 +452,411 @@
     <h1 class="name">ash<span>lyzh</span></h1>
     <p class="handle">@_ashyzh · ashsayshii.dev.wales</p>
 
-    <div class="bio">
-      <p class="bio-line">
-        <span class="bio-accent">vtuber</span>
-        <span class="dot">◆</span>
-        ranked grind
-        <span class="dot">◆</span>
-        wheel on track
-      </p>
-      <p class="bio-line">
-        valorant · osu! · assetto corsa · minecraft
-        <span style="font-size:0.9rem">🇧🇷</span>
-      </p>
+    <div class="roles">
+      <span class="role role-primary">Webdev</span>
+      <span class="role role-primary">Designer</span>
+      <span class="role role-secondary">Streamer</span>
+      <span class="role role-secondary">🇧🇷</span>
     </div>
 
-    <div class="tags">
-      <a class="twitch-status-pill" id="twitch-status-pill" href="https://twitch.tv/dr1wn" target="_blank" rel="noopener">
-        <span class="twitch-status-dot" id="twitch-status-dot"></span>
-        <span id="twitch-status-text">checking...</span>
-      </a>
+    <div class="available-badge">
+      <span class="available-dot"></span>
+      Available For Freelance
     </div>
+
+    <a class="twitch-pill" id="twitch-pill" href="https://twitch.tv/dr1wn" target="_blank" rel="noopener">
+      <span class="twitch-dot" id="twitch-dot"></span>
+      <span id="twitch-status-text">Checking...</span>
+    </a>
+
   </header>
 
-  <!-- status row: valorant rank + visitor count -->
-  <div class="status-row">
-    <div class="status-pill">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="rgba(255,70,84,0.8)"><path d="M12.602.222a.504.504 0 0 0-.813.372L11.4 5.28a.504.504 0 0 1-.504.477H6.148a.504.504 0 0 0-.35.863l9.853 9.392a.504.504 0 0 0 .762-.094l4.2-6.804a.504.504 0 0 0-.308-.749L12.602.222zm-1.204 23.556a.504.504 0 0 0 .813-.372l.389-4.686a.504.504 0 0 1 .504-.477h4.748a.504.504 0 0 0 .35-.863L8.349 8.988a.504.504 0 0 0-.762.094l-4.2 6.804a.504.504 0 0 0 .308.749l7.703 7.143z"/></svg>
-      <span id="val-rank" class="pill-val">—</span>
-    </div>
-    <div class="status-pill" id="visitors-pill" onclick="toggleComments()" style="cursor:none;">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="rgba(91,163,245,0.7)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
-      <span class="pill-val">visitors <span id="comment-count"></span></span>
-      <span style="font-size:0.6rem;color:var(--muted);margin-left:2px;">▾</span>
-    </div>
+  <!-- tab switcher -->
+  <div class="tab-bar" role="tablist">
+    <div class="tab-indicator" id="tab-indicator"></div>
+    <button class="tab-btn active" id="tab-about" onclick="switchTab('about')" role="tab">About</button>
+    <button class="tab-btn"        id="tab-portfolio" onclick="switchTab('portfolio')" role="tab">Portfolio</button>
   </div>
 
-  <!-- comments panel -->
-  <div class="comments-panel" id="comments-panel">
-    <div class="comments-list" id="comments-list">
-      <p class="comments-empty" id="comments-empty">no comments yet. be first 👀</p>
-    </div>
-    <div class="comment-form">
-      <input class="comment-input" id="comment-name" type="text" placeholder="name" maxlength="32" autocomplete="off">
-      <input class="comment-input" id="comment-msg" type="text" placeholder="leave a message..." maxlength="140" autocomplete="off">
-      <button class="comment-submit" onclick="submitComment()">post</button>
-    </div>
-  </div>
-  <div class="playing-card" style="margin-bottom:10px;">
-    <div class="playing-icon" id="game-icon">🎮</div>
-    <div class="playing-text">
-      <span class="playing-label">CURRENTLY PLAYING</span>
-      <span class="playing-game" id="game-name">Valorant</span>
-    </div>
-  </div>
+  <!-- sliding content -->
+  <div class="panels-viewport">
+    <div class="panels-track" id="panels-track">
 
-  <nav class="links" aria-label="Links">
+      <!-- ABOUT panel -->
+      <div class="panel" id="panel-about">
 
-    <a class="link" id="twitch-link" href="https://twitch.tv/dr1wn" target="_blank" rel="noopener">
-      <div class="link-icon" style="background:rgba(145,70,255,0.15);">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="rgba(145,70,255,0.9)"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>
-      </div>
-      <div class="link-text">
-        <span class="link-title" id="twitch-label"><span class="status-dot" style="background:rgba(145,70,255,0.5);"></span>twitch</span>
-        <span class="link-sub">twitch.tv/dr1wn</span>
-      </div>
-    </a>
-
-    <a class="link" href="https://x.com/_ashyzh" target="_blank" rel="noopener">
-      <div class="link-icon" style="background:rgba(255,255,255,0.05);">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="rgba(240,238,232,0.7)"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-      </div>
-      <div class="link-text">
-        <span class="link-title">twitter / x</span>
-        <span class="link-sub">@_ashyzh</span>
-      </div>
-    </a>
-
-    <div class="divider"></div>
-
-    <div class="link no-arrow" onclick="copyDiscord()">
-      <div class="link-icon" style="background:rgba(88,101,242,0.15);">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="rgba(88,101,242,0.9)"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
-      </div>
-      <div class="link-text">
-        <span class="link-title">discord</span>
-        <span class="link-sub">sently. — click to copy</span>
-      </div>
-    </div>
-
-    <div class="divider"></div>
-
-    <div class="link no-arrow" id="spotify-card" onclick="openSpotify()">
-      <div class="link-icon" style="background:rgba(29,185,84,0.12);">
-        <div class="music-bar" id="music-bars">
-          <span></span><span></span><span></span><span></span>
+        <div class="about-card">
+          <!-- edit ABOUT_TEXT in the script config below -->
+          <p id="about-text"></p>
         </div>
-      </div>
-      <div class="link-text">
-        <span class="link-title" id="song-title">loading...</span>
-        <span class="link-sub" id="song-artist">spotify</span>
-      </div>
-    </div>
 
-  </nav>
+        <div class="status-row">
+          <div class="status-pill">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="rgba(255,70,84,0.72)"><path d="M12.602.222a.504.504 0 0 0-.813.372L11.4 5.28a.504.504 0 0 1-.504.477H6.148a.504.504 0 0 0-.35.863l9.853 9.392a.504.504 0 0 0 .762-.094l4.2-6.804a.504.504 0 0 0-.308-.749L12.602.222zm-1.204 23.556a.504.504 0 0 0 .813-.372l.389-4.686a.504.504 0 0 1 .504-.477h4.748a.504.504 0 0 0 .35-.863L8.349 8.988a.504.504 0 0 0-.762.094l-4.2 6.804a.504.504 0 0 0 .308.749l7.703 7.143z"/></svg>
+            <span id="val-rank" class="pill-val">—</span>
+          </div>
+          <div class="status-pill" id="visitors-pill" onclick="toggleComments()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="rgba(91,163,245,0.62)"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <span class="pill-val">Comments <span id="comment-count"></span></span>
+            <span style="font-size:.52rem;color:var(--muted);margin-left:1px;" id="comments-chevron">▾</span>
+          </div>
+        </div>
+
+        <div class="comments-panel" id="comments-panel">
+          <div class="comments-list" id="comments-list">
+            <p class="comments-empty" id="comments-empty">No comments yet. Be first 👀</p>
+          </div>
+          <div class="comment-form">
+            <input class="comment-input" id="comment-name" type="text" placeholder="name" maxlength="32" autocomplete="off">
+            <input class="comment-input" id="comment-msg"  type="text" placeholder="leave a message..." maxlength="140" autocomplete="off">
+            <button class="comment-submit" onclick="submitComment()">Post</button>
+          </div>
+        </div>
+
+        <div class="playing-card">
+          <div class="playing-icon" id="game-icon">🎮</div>
+          <div>
+            <div class="playing-label">CURRENTLY PLAYING</div>
+            <div class="playing-game" id="game-name">Valorant</div>
+          </div>
+        </div>
+
+        <p class="section-label">LINKS</p>
+
+        <nav class="links">
+
+          <a class="link" id="twitch-link" href="https://twitch.tv/dr1wn" target="_blank" rel="noopener">
+            <div class="link-icon" style="background:rgba(145,70,255,0.13);">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="rgba(145,70,255,0.88)"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>
+            </div>
+            <div class="link-text">
+              <span class="link-title" id="twitch-label">Twitch</span>
+              <span class="link-sub">twitch.tv/dr1wn</span>
+            </div>
+          </a>
+
+          <a class="link" href="https://x.com/_ashyzh" target="_blank" rel="noopener">
+            <div class="link-icon" style="background:rgba(255,255,255,0.04);">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="rgba(238,236,234,0.62)"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </div>
+            <div class="link-text">
+              <span class="link-title">Twitter / X</span>
+              <span class="link-sub">@_ashyzh</span>
+            </div>
+          </a>
+
+          <div class="divider"></div>
+
+          <div class="link no-arrow" onclick="copyDiscord()">
+            <div class="link-icon" style="background:rgba(88,101,242,0.13);">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="rgba(88,101,242,0.88)"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+            </div>
+            <div class="link-text">
+              <span class="link-title">Discord</span>
+              <span class="link-sub">sently. — click to copy</span>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="link no-arrow" id="spotify-card" onclick="openSpotify()">
+            <div class="link-icon" style="background:rgba(29,185,84,0.09);">
+              <div class="music-bar" id="music-bars">
+                <span></span><span></span><span></span><span></span>
+              </div>
+            </div>
+            <div class="link-text">
+              <span class="link-title" id="song-title">Loading...</span>
+              <span class="link-sub" id="song-artist">Spotify</span>
+            </div>
+          </div>
+
+        </nav>
+      </div><!-- /panel about -->
+
+      <!-- PORTFOLIO panel -->
+      <div class="panel" id="panel-portfolio" style="padding-left:12px;">
+
+        <div class="portfolio-grid">
+
+          <div class="project-card">
+            <div class="mockup-wrap">
+              <div class="browser-bar mockup-salon" style="background:rgba(30,10,28,0.92);">
+                <div class="bdot" style="background:#ff5f56;"></div>
+                <div class="bdot" style="background:#ffbd2e;"></div>
+                <div class="bdot" style="background:#27c93f;"></div>
+              </div>
+              <div class="mockup-content mockup-salon">
+                <div class="salon-hero"><div class="salon-logo"></div><div class="salon-sub"></div></div>
+                <div class="salon-cards"><div class="salon-card"></div><div class="salon-card"></div><div class="salon-card"></div></div>
+              </div>
+            </div>
+            <div class="project-info">
+              <div class="project-header">
+                <span class="project-name">Studio Belle</span>
+                <span class="project-type">Beauty Salon</span>
+              </div>
+              <p class="project-desc">Landing page with service menu, gallery and online booking.</p>
+              <div class="project-tags">
+                <span class="project-tag">HTML</span>
+                <span class="project-tag">CSS</span>
+                <span class="project-tag">JS</span>
+                <span class="project-tag">Landing Page</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="project-card">
+            <div class="mockup-wrap">
+              <div class="browser-bar" style="background:rgba(10,12,16,0.92);">
+                <div class="bdot" style="background:#ff5f56;"></div>
+                <div class="bdot" style="background:#ffbd2e;"></div>
+                <div class="bdot" style="background:#27c93f;"></div>
+              </div>
+              <div class="mockup-content mockup-detail">
+                <div class="detail-hero">
+                  <div><div class="detail-title"></div><div class="detail-sub"></div></div>
+                  <div class="detail-cta"></div>
+                </div>
+                <div class="detail-services"><div class="detail-srv"></div><div class="detail-srv"></div><div class="detail-srv"></div></div>
+              </div>
+            </div>
+            <div class="project-info">
+              <div class="project-header">
+                <span class="project-name">PrimeCoat</span>
+                <span class="project-type">Car Detailing</span>
+              </div>
+              <p class="project-desc">Service showcase and quote request page for a detailing & ceramic coating shop.</p>
+              <div class="project-tags">
+                <span class="project-tag">HTML</span>
+                <span class="project-tag">CSS</span>
+                <span class="project-tag">JS</span>
+                <span class="project-tag">Landing Page</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="project-card">
+            <div class="mockup-wrap">
+              <div class="browser-bar" style="background:rgba(8,11,18,0.92);">
+                <div class="bdot" style="background:#ff5f56;"></div>
+                <div class="bdot" style="background:#ffbd2e;"></div>
+                <div class="bdot" style="background:#27c93f;"></div>
+              </div>
+              <div class="mockup-content mockup-law">
+                <div class="law-nav"><div class="law-logo-bar"></div><div class="law-nav-links"><div class="law-nav-link"></div><div class="law-nav-link"></div><div class="law-nav-link"></div></div></div>
+                <div class="law-hero"><div class="law-title"></div><div class="law-sub"></div></div>
+                <div class="law-body"><div class="law-col"></div><div class="law-col"></div><div class="law-col"></div></div>
+              </div>
+            </div>
+            <div class="project-info">
+              <div class="project-header">
+                <span class="project-name">Raulindo Gomes</span>
+                <span class="project-type">Law Firm</span>
+              </div>
+              <p class="project-desc">Institutional site covering areas of expertise, team profiles and contact.</p>
+              <div class="project-tags">
+                <span class="project-tag">HTML</span>
+                <span class="project-tag">CSS</span>
+                <span class="project-tag">JS</span>
+                <span class="project-tag">Institutional</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div><!-- /panel portfolio -->
+
+    </div><!-- /panels-track -->
+  </div><!-- /panels-viewport -->
 
   <footer class="footer">
-    <div class="visitor-count">
-      <img src="https://hits.sh/ashsayshii.dev.wales.svg?style=flat-square&color=5ba3f5&label=visitors&labelColor=12121a" alt="visitor count" height="18">
-    </div>
+    <img src="https://hits.sh/ashsayshii.dev.wales.svg?style=flat-square&color=5ba3f5&label=visitors&labelColor=111118" alt="visitors" height="16">
     <p>ashsayshii.dev.wales</p>
   </footer>
 
 </main>
 
-<div class="toast" id="toast">copied sently. ✓</div>
+<div class="toast" id="toast">Copied sently. ✓</div>
 
 <script>
   // ─── CONFIG ──────────────────────────────────────────────
   const LASTFM_API_KEY  = '6e3b02b4cf0d93cf2b7904d06d432281';
   const LASTFM_USERNAME = 'yz_o';
-
-  const VAL_NAME   = 'ash';
-  const VAL_TAG    = 'balls';
-  const VAL_REGION = 'br';
-  const HENRIK_KEY = 'HDEV-94d937fe-555f-4c26-b01e-2a5e08975785';
-
+  const VAL_NAME        = 'ash';
+  const VAL_TAG         = 'balls';
+  const VAL_REGION      = 'br';
+  const HENRIK_KEY      = 'HDEV-94d937fe-555f-4c26-b01e-2a5e08975785';
+  const JSONBIN_BIN_ID  = '69ee410436566621a8f39960';
+  const JSONBIN_API_KEY = '$2a$10$4axX2M.qFpEJd1Q9xsv3meb0aXHzahzd8CqOBpznpXKNsAqJDlThG';
   const CURRENT_GAME      = 'Valorant';
   const CURRENT_GAME_ICON = '🎮';
 
-  // COMMENTS — jsonbin.io setup (free):
-  // 1. go to jsonbin.io and create a free account
-  // 2. go to Bins → Create a Bin, paste: {"comments":[]}
-  // 3. copy the Bin ID from the URL
-  // 4. go to API Keys → create a key (any name)
-  // 5. paste both below
-  const JSONBIN_BIN_ID = '69ee410436566621a8f39960';
-  const JSONBIN_API_KEY = '$2a$10$4axX2M.qFpEJd1Q9xsv3meb0aXHzahzd8CqOBpznpXKNsAqJDlThG';
+  // edit this to change your about me blurb
+  const ABOUT_TEXT = `19 y/o from <span>Brazil</span>. I design and build websites for small businesses — clean, fast and actually good-looking. When I'm not working I'm grinding ranked on <span>Valorant</span> or streaming on <span>Twitch</span>. Hit me up if you need a site.`;
   // ─────────────────────────────────────────────────────────
 
-  document.getElementById('game-name').textContent = CURRENT_GAME;
-  document.getElementById('game-icon').textContent = CURRENT_GAME_ICON;
+  document.getElementById('game-name').textContent   = CURRENT_GAME;
+  document.getElementById('game-icon').textContent   = CURRENT_GAME_ICON;
+  document.getElementById('about-text').innerHTML    = ABOUT_TEXT;
 
-  // ── cursor trail ─────────────────────────────────────────
-  const cursor = document.getElementById('cursor');
-  const TRAIL_LENGTH = 12;
-  const trail = [];
-  for (let i = 0; i < TRAIL_LENGTH; i++) {
-    const dot = document.createElement('div');
-    dot.className = 'trail-dot';
-    dot.style.opacity = ((TRAIL_LENGTH - i) / TRAIL_LENGTH * 0.5).toString();
-    dot.style.width = dot.style.height = Math.max(2, 6 - i * 0.4) + 'px';
-    document.body.appendChild(dot);
-    trail.push({ el: dot, x: 0, y: 0 });
+  // tab switching
+  let currentTab = 'about';
+  function switchTab(tab) {
+    currentTab = tab;
+    const track     = document.getElementById('panels-track');
+    const indicator = document.getElementById('tab-indicator');
+    const btnAbout  = document.getElementById('tab-about');
+    const btnPort   = document.getElementById('tab-portfolio');
+
+    if (tab === 'portfolio') {
+      track.classList.add('show-portfolio');
+      indicator.classList.add('right');
+      btnAbout.classList.remove('active');
+      btnPort.classList.add('active');
+    } else {
+      track.classList.remove('show-portfolio');
+      indicator.classList.remove('right');
+      btnAbout.classList.add('active');
+      btnPort.classList.remove('active');
+    }
   }
-  let mouseX = 0, mouseY = 0;
-  document.addEventListener('mousemove', e => {
-    mouseX = e.clientX; mouseY = e.clientY;
-    cursor.style.left = mouseX + 'px';
-    cursor.style.top  = mouseY + 'px';
-  });
-  (function animateTrail() {
-    trail.forEach((dot, i) => {
-      const prev = i === 0 ? { x: mouseX, y: mouseY } : trail[i - 1];
-      dot.x += (prev.x - dot.x) * 0.4;
-      dot.y += (prev.y - dot.y) * 0.4;
-      dot.el.style.left = dot.x + 'px';
-      dot.el.style.top  = dot.y + 'px';
+
+  // swipe support
+  let touchStartX = 0;
+  document.querySelector('.panels-viewport').addEventListener('touchstart', e => {
+    touchStartX = e.touches[0].clientX;
+  }, {passive: true});
+  document.querySelector('.panels-viewport').addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 50) switchTab(dx < 0 ? 'portfolio' : 'about');
+  }, {passive: true});
+
+  // cursor (desktop)
+  const isMobile = 'ontouchstart' in window || window.matchMedia('(max-width:480px)').matches;
+  if (!isMobile) {
+    const cur = document.getElementById('cursor');
+    const T = 12;
+    const trail = Array.from({length:T},(_,i)=>{
+      const d=document.createElement('div'); d.className='trail-dot';
+      d.style.cssText=`opacity:${(T-i)/T*0.45};width:${Math.max(2,6-i*0.38)}px;height:${Math.max(2,6-i*0.38)}px`;
+      document.body.appendChild(d); return{el:d,x:0,y:0};
     });
-    requestAnimationFrame(animateTrail);
-  })();
-
-  // ── twitch live + last stream date ───────────────────────
-  function timeAgo(dateStr) {
-    const d = new Date(dateStr);
-    if (isNaN(d)) return null;
-    const diff = (Date.now() - d) / 1000;
-    if (diff < 3600)   return `${Math.floor(diff/60)}m ago`;
-    if (diff < 86400)  return `${Math.floor(diff/3600)}h ago`;
-    if (diff < 604800) return `${Math.floor(diff/86400)}d ago`;
-    return d.toLocaleDateString('en', { month: 'short', day: 'numeric' });
+    let mx=0,my=0;
+    document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px';});
+    (function loop(){trail.forEach((d,i)=>{const p=i===0?{x:mx,y:my}:trail[i-1];d.x+=(p.x-d.x)*.4;d.y+=(p.y-d.y)*.4;d.el.style.left=d.x+'px';d.el.style.top=d.y+'px';});requestAnimationFrame(loop);})();
   }
 
-  async function checkTwitchLive() {
-    const pill     = document.getElementById('twitch-status-pill');
-    const pillText = document.getElementById('twitch-status-text');
-    try {
-      const res  = await fetch('https://decapi.me/twitch/uptime/dr1wn');
-      const text = (await res.text()).trim();
-      const isLive = !text.toLowerCase().includes('offline') && !text.toLowerCase().includes('error') && text.length > 0;
+  // twitch
+  function timeAgo(s){const d=new Date(s);if(isNaN(d))return null;const t=(Date.now()-d)/1000;if(t<3600)return`${Math.floor(t/60)}m ago`;if(t<86400)return`${Math.floor(t/3600)}h ago`;if(t<604800)return`${Math.floor(t/86400)}d ago`;return d.toLocaleDateString('en',{month:'short',day:'numeric'});}
 
-      if (isLive) {
+  async function checkTwitchLive(){
+    const pill=document.getElementById('twitch-pill');
+    const txt=document.getElementById('twitch-status-text');
+    try{
+      const raw=(await(await fetch('https://decapi.me/twitch/uptime/dr1wn')).text()).trim();
+      const live=!raw.toLowerCase().includes('offline')&&!raw.toLowerCase().includes('error')&&raw.length>2;
+      if(live){
         document.getElementById('live-banner').classList.add('visible');
-        document.getElementById('live-text').textContent = `LIVE — ${text}`;
+        document.getElementById('live-text').textContent=`LIVE — ${raw}`;
         document.getElementById('twitch-link').classList.add('live-link');
-        document.getElementById('twitch-label').innerHTML =
-          '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#ff4444;margin-right:6px;animation:pulse-red 1.5s ease-in-out infinite;"></span>live now';
+        document.getElementById('twitch-label').innerHTML='<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#ff4444;margin-right:5px;animation:pulse-r 1.5s ease-in-out infinite;"></span>Live Now';
         document.getElementById('avatar-wrap').classList.add('live');
-        pill.classList.add('live'); pill.classList.remove('offline');
-        pillText.textContent = '🔴 LIVE NOW';
+        pill.classList.add('live');txt.textContent='🔴 LIVE NOW';
       } else {
-        pill.classList.add('offline'); pill.classList.remove('live');
-        // fetch last VOD created_at via decapi videos endpoint
-        try {
-          const vodRes  = await fetch('https://decapi.me/twitch/videos/dr1wn?limit=1&offset=0');
-          const vodText = (await vodRes.text()).trim();
-          // decapi returns: "Title | https://... | YYYY-MM-DD HH:MM:SS"
-          const parts = vodText.split('|');
-          if (parts.length >= 3) {
-            const ago = timeAgo(parts[2].trim());
-            pillText.textContent = ago ? `last live: ${ago}` : 'last live: recently';
-          } else {
-            pillText.textContent = 'offline';
-          }
-        } catch {
-          pillText.textContent = 'offline';
-        }
+        pill.classList.remove('live');
+        try{const vt=(await(await fetch('https://decapi.me/twitch/videos/dr1wn?limit=1&offset=0')).text()).trim();const parts=vt.split('|');const ago=parts.length>=3?timeAgo(parts[2].trim()):null;txt.textContent=ago?`Last live: ${ago}`:'Offline';}
+        catch{txt.textContent='Offline';}
       }
-    } catch {
-      document.getElementById('twitch-status-pill').classList.add('offline');
-      document.getElementById('twitch-status-text').textContent = 'offline';
-    }
+    }catch{txt.textContent='Offline';}
   }
 
-  // ── val rank ─────────────────────────────────────────────
-  async function fetchValRank() {
-    const el = document.getElementById('val-rank');
-    try {
-      // try v3 first (latest henrik endpoint)
-      let res = await fetch(
-        `https://api.henrikdev.xyz/valorant/v3/mmr/${VAL_REGION}/pc/${encodeURIComponent(VAL_NAME)}/${encodeURIComponent(VAL_TAG)}`,
-        { headers: { 'Authorization': HENRIK_KEY } }
-      );
-      let data = await res.json();
-
-      let tier, rr;
-
-      if (data.status === 200 && data.data?.current) {
-        tier = data.data.current.tier?.name || '—';
-        rr   = data.data.current.rr ?? '';
-      } else {
-        res  = await fetch(
-          `https://api.henrikdev.xyz/valorant/v2/mmr/${VAL_REGION}/${encodeURIComponent(VAL_NAME)}/${encodeURIComponent(VAL_TAG)}`,
-          { headers: { 'Authorization': HENRIK_KEY } }
-        );
-        data = await res.json();
-        if (data.status === 200 && data.data?.current_data) {
-          tier = data.data.current_data.currenttierpatched || '—';
-          rr   = data.data.current_data.ranking_in_tier ?? '';
-        } else {
-          el.textContent = '—'; return;
-        }
+  // val rank
+  async function fetchValRank(){
+    const el=document.getElementById('val-rank');
+    try{
+      let r=await fetch(`https://api.henrikdev.xyz/valorant/v3/mmr/${VAL_REGION}/pc/${encodeURIComponent(VAL_NAME)}/${encodeURIComponent(VAL_TAG)}`,{headers:{'Authorization':HENRIK_KEY}});
+      let d=await r.json(); let tier,rr;
+      if(d.status===200&&d.data?.current){tier=d.data.current.tier?.name||'—';rr=d.data.current.rr??'';}
+      else{
+        r=await fetch(`https://api.henrikdev.xyz/valorant/v2/mmr/${VAL_REGION}/${encodeURIComponent(VAL_NAME)}/${encodeURIComponent(VAL_TAG)}`,{headers:{'Authorization':HENRIK_KEY}});
+        d=await r.json();
+        if(d.status===200&&d.data?.current_data){tier=d.data.current_data.currenttierpatched||'—';rr=d.data.current_data.ranking_in_tier??'';}
+        else{el.textContent='—';return;}
       }
-
-      const t = (tier || '').toLowerCase();
-      let cls = '';
-      if (t.includes('iron'))      cls = 'rank-iron';
-      else if (t.includes('bronze'))    cls = 'rank-bronze';
-      else if (t.includes('silver'))    cls = 'rank-silver';
-      else if (t.includes('gold'))      cls = 'rank-gold';
-      else if (t.includes('platinum'))  cls = 'rank-platinum';
-      else if (t.includes('diamond'))   cls = 'rank-diamond';
-      else if (t.includes('ascendant')) cls = 'rank-ascendant';
-      else if (t.includes('immortal'))  cls = 'rank-immortal';
-      else if (t.includes('radiant'))   cls = 'rank-radiant';
-
-      el.textContent = rr !== '' ? `${tier} · ${rr}RR` : tier;
-      el.className = `pill-val ${cls}`;
-    } catch {
-      el.textContent = '—';
-    }
+      const t=(tier||'').toLowerCase();
+      const cls=t.includes('iron')?'rank-iron':t.includes('bronze')?'rank-bronze':t.includes('silver')?'rank-silver':t.includes('gold')?'rank-gold':t.includes('platinum')?'rank-platinum':t.includes('diamond')?'rank-diamond':t.includes('ascendant')?'rank-ascendant':t.includes('immortal')?'rank-immortal':t.includes('radiant')?'rank-radiant':'';
+      el.textContent=rr!==''?`${tier} · ${rr}RR`:tier;
+      el.className=`pill-val ${cls}`;
+    }catch{el.textContent='—';}
   }
 
-  // ── spotify / last.fm ────────────────────────────────────
-  let spotifyUrl = 'https://open.spotify.com';
-  async function fetchLastPlayed() {
-    try {
-      const res  = await fetch(
-        `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${LASTFM_USERNAME}&api_key=${LASTFM_API_KEY}&format=json&limit=1`
-      );
-      const data  = await res.json();
-      const track = data.recenttracks.track[0];
-      const isNowPlaying = track['@attr']?.nowplaying === 'true';
-      spotifyUrl  = track.url;
-      document.getElementById('song-title').textContent = track.name;
-      document.getElementById('song-artist').textContent =
-        (isNowPlaying ? '▶  ' : '↺  ') + track.artist['#text'];
-      const bars = document.getElementById('music-bars');
-      isNowPlaying ? bars.classList.remove('paused') : bars.classList.add('paused');
-    } catch {
-      document.getElementById('song-title').textContent = 'music';
-      document.getElementById('song-artist').textContent = 'spotify';
-      document.getElementById('music-bars').classList.add('paused');
-    }
+  // last.fm
+  let spotifyUrl='https://open.spotify.com';
+  async function fetchLastPlayed(){
+    try{
+      const d=await(await fetch(`https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${LASTFM_USERNAME}&api_key=${LASTFM_API_KEY}&format=json&limit=1`)).json();
+      const tr=d.recenttracks.track[0]; const live=tr['@attr']?.nowplaying==='true';
+      spotifyUrl=tr.url;
+      document.getElementById('song-title').textContent=tr.name;
+      document.getElementById('song-artist').textContent=(live?'▶  ':'↺  ')+tr.artist['#text'];
+      document.getElementById('music-bars').classList.toggle('paused',!live);
+    }catch{document.getElementById('song-title').textContent='Music';document.getElementById('song-artist').textContent='Spotify';document.getElementById('music-bars').classList.add('paused');}
   }
-  function openSpotify() { window.open(spotifyUrl, '_blank', 'noopener'); }
+  function openSpotify(){window.open(spotifyUrl,'_blank','noopener');}
 
-  // ── discord copy ─────────────────────────────────────────
-  function copyDiscord() {
-    navigator.clipboard.writeText('sently.').then(() => {
-      const t = document.getElementById('toast');
-      t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 2000);
+  function copyDiscord(){
+    navigator.clipboard.writeText('sently.').then(()=>{
+      const t=document.getElementById('toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);
     });
   }
 
-  // ── comments ─────────────────────────────────────────────
-  let commentsOpen = false;
-  let commentsData = [];
-
-  function toggleComments() {
-    commentsOpen = !commentsOpen;
-    const panel = document.getElementById('comments-panel');
-    panel.classList.toggle('open', commentsOpen);
-    if (commentsOpen && commentsData.length === 0) loadComments();
+  // comments
+  let commentsOpen=false,commentsData=[];
+  function toggleComments(){
+    commentsOpen=!commentsOpen;
+    document.getElementById('comments-panel').classList.toggle('open',commentsOpen);
+    document.getElementById('comments-chevron').textContent=commentsOpen?'▴':'▾';
+    if(commentsOpen&&!commentsData.length)loadComments();
   }
-
-  async function loadComments() {
-    if (JSONBIN_BIN_ID === 'YOUR_BIN_ID_HERE') {
-      document.getElementById('comments-empty').textContent = 'set up jsonbin to enable comments — see code comments';
-      return;
-    }
-    try {
-      const res  = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
-        headers: { 'X-Master-Key': JSONBIN_API_KEY }
-      });
-      const data = await res.json();
-      commentsData = data.record.comments || [];
-      renderComments();
-    } catch {
-      document.getElementById('comments-empty').textContent = 'could not load comments';
-    }
+  async function loadComments(){
+    try{
+      const d=await(await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`,{headers:{'X-Master-Key':JSONBIN_API_KEY}})).json();
+      commentsData=d.record.comments||[];renderComments();
+    }catch{document.getElementById('comments-empty').textContent='Could not load comments.';}
   }
-
-  function renderComments() {
-    const list  = document.getElementById('comments-list');
-    const empty = document.getElementById('comments-empty');
-    if (commentsData.length === 0) { empty.style.display = 'block'; return; }
-    empty.style.display = 'none';
-    list.innerHTML = '';
-    // newest first
-    [...commentsData].reverse().forEach(c => {
-      const item = document.createElement('div');
-      item.className = 'comment-item';
-      item.innerHTML = `
-        <div class="comment-author">${escHtml(c.name)}</div>
-        <div class="comment-text">${escHtml(c.msg)}</div>
-        <div class="comment-time">${c.time}</div>
-      `;
-      list.appendChild(item);
+  function renderComments(){
+    const list=document.getElementById('comments-list');
+    const empty=document.getElementById('comments-empty');
+    document.getElementById('comment-count').textContent=commentsData.length?`(${commentsData.length})`:'';
+    if(!commentsData.length){empty.style.display='block';return;}
+    empty.style.display='none';list.innerHTML='';
+    [...commentsData].reverse().forEach(c=>{
+      const el=document.createElement('div');el.className='comment-item';
+      el.innerHTML=`<div class="comment-author">${esc(c.name)}</div><div class="comment-text">${esc(c.msg)}</div><div class="comment-time">${c.time}</div>`;
+      list.appendChild(el);
     });
   }
-
-  async function submitComment() {
-    if (JSONBIN_BIN_ID === 'YOUR_BIN_ID_HERE') return;
-    const name = document.getElementById('comment-name').value.trim();
-    const msg  = document.getElementById('comment-msg').value.trim();
-    if (!name || !msg) return;
-    const btn = document.querySelector('.comment-submit');
-    btn.textContent = '...'; btn.disabled = true;
-    try {
-      // fetch latest first to avoid clobbering
-      const getRes = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
-        headers: { 'X-Master-Key': JSONBIN_API_KEY }
-      });
-      const latest = await getRes.json();
-      const existing = latest.record.comments || [];
-      const newComment = {
-        name,
-        msg,
-        time: new Date().toLocaleDateString('en', { month: 'short', day: 'numeric', year: 'numeric' })
-      };
-      existing.push(newComment);
-      await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_API_KEY },
-        body: JSON.stringify({ comments: existing })
-      });
-      commentsData = existing;
-      renderComments();
-      document.getElementById('comment-name').value = '';
-      document.getElementById('comment-msg').value = '';
-    } catch {
-      /* silent fail */
-    }
-    btn.textContent = 'post'; btn.disabled = false;
+  async function submitComment(){
+    const name=document.getElementById('comment-name').value.trim();
+    const msg=document.getElementById('comment-msg').value.trim();
+    if(!name||!msg)return;
+    const btn=document.querySelector('.comment-submit');btn.textContent='...';btn.disabled=true;
+    try{
+      const latest=await(await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`,{headers:{'X-Master-Key':JSONBIN_API_KEY}})).json();
+      const arr=latest.record.comments||[];
+      arr.push({name,msg,time:new Date().toLocaleDateString('en',{month:'short',day:'numeric',year:'numeric'})});
+      await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':JSONBIN_API_KEY},body:JSON.stringify({comments:arr})});
+      commentsData=arr;renderComments();
+      document.getElementById('comment-name').value='';document.getElementById('comment-msg').value='';
+    }catch{}
+    btn.textContent='Post';btn.disabled=false;
   }
+  function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-  function escHtml(str) {
-    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-
-  // ── init ─────────────────────────────────────────────────
-  checkTwitchLive();
-  fetchValRank();
-  fetchLastPlayed();
-  setInterval(fetchLastPlayed, 60000);
-  setInterval(checkTwitchLive, 120000);
+  // init
+  checkTwitchLive();fetchValRank();fetchLastPlayed();
+  setInterval(fetchLastPlayed,60000);setInterval(checkTwitchLive,120000);
 </script>
-
 </body>
 </html>
