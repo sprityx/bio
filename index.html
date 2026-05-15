@@ -279,11 +279,55 @@ body::before {
 .comment-submit:hover { background: rgba(91,163,245,0.18); }
 
 /* playing */
+/* specs */
+.playing-wrap {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; overflow: hidden;
+}
 .playing-card {
   display: flex; align-items: center; gap: 12px;
-  padding: 11px 15px; background: var(--surface);
-  border: 1px solid var(--border); border-radius: 12px;
+  padding: 11px 15px; cursor: none;
 }
+.specs-lip {
+  width: 100%; display: flex; align-items: center; justify-content: center;
+  gap: 6px; padding: 6px 15px;
+  background: rgba(255,255,255,0.025);
+  border: none; border-top: 1px solid var(--border);
+  color: var(--muted); font-family: 'Space Mono', monospace;
+  font-size: 0.63rem; letter-spacing: 0.06em; font-weight: 700;
+  cursor: none; transition: background 0.2s, color 0.2s;
+}
+.specs-lip:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+.specs-lip.open { color: var(--accent); }
+
+.specs-drawer {
+  display: none; flex-direction: column;
+  border-top: 1px solid var(--border);
+  animation: fadeSlide 0.18s ease;
+}
+.specs-drawer.open { display: flex; }
+
+.specs-section { padding: 12px 15px; }
+.specs-section-title {
+  font-family: 'Space Mono', monospace; font-size: 0.6rem;
+  letter-spacing: 0.1em; color: var(--accent);
+  margin-bottom: 8px; opacity: 0.8;
+}
+.specs-grid { display: flex; flex-direction: column; gap: 5px; }
+.spec-row {
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: 10px;
+}
+.spec-label {
+  font-family: 'Space Mono', monospace; font-size: 0.65rem;
+  color: var(--muted); white-space: nowrap; flex-shrink: 0;
+}
+.spec-val {
+  font-size: 0.75rem; font-weight: 700;
+  color: rgba(238,236,234,0.8); text-align: right;
+}
+.specs-divider { height: 1px; background: var(--border); margin: 0 15px; }
+
 .playing-icon { font-size: 1.2rem; flex-shrink: 0; width: 30px; text-align: center; }
 .playing-label { font-family: 'Space Mono', monospace; font-size: 0.59rem; color: var(--muted); letter-spacing: 0.06em; }
 .playing-game { font-size: 0.85rem; font-weight: 700; margin-top: 1px; }
@@ -513,11 +557,43 @@ body::before {
           </div>
         </div>
 
-        <div class="playing-card">
-          <div class="playing-icon" id="game-icon">🎮</div>
-          <div>
-            <div class="playing-label">CURRENTLY PLAYING</div>
-            <div class="playing-game" id="game-name">Valorant</div>
+        <div class="playing-wrap">
+          <div class="playing-card" onclick="toggleSpecs()">
+            <div class="playing-icon" id="game-icon">🎮</div>
+            <div style="flex:1;">
+              <div class="playing-label">CURRENTLY PLAYING</div>
+              <div class="playing-game" id="game-name">Valorant</div>
+            </div>
+          </div>
+          <button class="specs-lip" onclick="toggleSpecs()" id="specs-lip">
+            <span>My Specs</span>
+            <span id="specs-chevron" style="font-size:0.55rem;">▾</span>
+          </button>
+          <div class="specs-drawer" id="specs-drawer">
+            <div class="specs-section">
+              <p class="specs-section-title">PC</p>
+              <div class="specs-grid">
+                <div class="spec-row"><span class="spec-label">CPU</span><span class="spec-val">Ryzen 7 5700X3D</span></div>
+                <div class="spec-row"><span class="spec-label">GPU</span><span class="spec-val">RTX 3060</span></div>
+                <div class="spec-row"><span class="spec-label">RAM</span><span class="spec-val">32GB DDR4</span></div>
+                <div class="spec-row"><span class="spec-label">Mobo</span><span class="spec-val">ASRock B550M Steel Legend</span></div>
+                <div class="spec-row"><span class="spec-label">Storage</span><span class="spec-val">1.82TB</span></div>
+                <div class="spec-row"><span class="spec-label">OS</span><span class="spec-val">Windows 11 Pro</span></div>
+              </div>
+            </div>
+            <div class="specs-divider"></div>
+            <div class="specs-section">
+              <p class="specs-section-title">Peripherals</p>
+              <div class="specs-grid">
+                <div class="spec-row"><span class="spec-label">Headset</span><span class="spec-val">AKG K240 MK2 Studio</span></div>
+                <div class="spec-row"><span class="spec-label">Mouse</span><span class="spec-val">Pulsar X2A eS</span></div>
+                <div class="spec-row"><span class="spec-label">Keyboard</span><span class="spec-val">Akko TAC75HE</span></div>
+                <div class="spec-row"><span class="spec-label">Main Monitor</span><span class="spec-val">LG Ultragear 24" 180Hz</span></div>
+                <div class="spec-row"><span class="spec-label">2nd Monitor</span><span class="spec-val">Samsung 24" 75Hz</span></div>
+                <div class="spec-row"><span class="spec-label">Mousepad</span><span class="spec-val">Artisan FX Zero</span></div>
+                <div class="spec-row"><span class="spec-label">Mic</span><span class="spec-val">Aliexpress mic + arm</span></div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -818,6 +894,15 @@ body::before {
       try{document.execCommand('copy');showToast();}catch{}
       document.body.removeChild(el);
     }
+  }
+
+  function toggleSpecs(){
+    const drawer=document.getElementById('specs-drawer');
+    const lip=document.getElementById('specs-lip');
+    const chev=document.getElementById('specs-chevron');
+    const open=drawer.classList.toggle('open');
+    lip.classList.toggle('open',open);
+    chev.textContent=open?'▴':'▾';
   }
 
   // comments
